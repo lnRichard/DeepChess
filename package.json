@@ -1,7 +1,7 @@
 {
   "name": "deepchess",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A minimal Electron chess application",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -18,10 +18,12 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^16.0.2",
-    "eslint": "^8.4.1"
+    "electron-reload": "^2.0.0-alpha.1",
+    "eslint": "^8.4.1",
+    "yarn": "^1.22.17"
   },
   "dependencies": {
-    "electron-reload": "^2.0.0-alpha.1",
-    "yarn": "^1.22.17"
+    "chess.js": "^0.12.0",
+    "jquery": "^3.6.0"
   }
 }
