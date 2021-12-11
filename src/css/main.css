@@ -19,6 +19,7 @@
 
 	--text1: hsl(var(--hue) 15% 85%);
 	--text2: hsl(var(--hue) 15% 65%);
+	--text3: hsl(var(--hue) 25% 65%);
 
 	--surface0: hsl(var(--hue) 10% 8%);
 	--surface1: hsl(var(--hue) 10% 10%);
@@ -40,6 +41,8 @@
 			);
 
 		--text2: hsl(var(--hue) calc(var(--saturation) / 2) 30%);
+
+		--text3: hsl(var(--hue) calc(var(--saturation) / 2) 30%); /* TODO: Change saturation for light theme */
 
 		/* very bright brand white */
 		--surface0: hsl(var(--hue) calc(var(--saturation) / 6) 96%);
@@ -188,4 +191,8 @@ fieldset:focus-within {
 	flex-direction: column;
 	align-content: flex-start;
 
+}
+
+.username {
+	color: var(--text3);
 }

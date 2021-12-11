@@ -6,5 +6,5 @@ const username = account["username"];
 
 let process = document.querySelectorAll(".process");
 for (let i = 0; i < process.length; i++) {
-   process[i].innerHTML = process[i].innerHTML.replaceAll("{username}", username);
+   process[i].innerHTML = process[i].innerHTML.replaceAll("{username}", `<span class="username">${username}</span>`);
 }
