@@ -228,3 +228,25 @@ li {
 li::before {
 	content: "» ";
 }
+
+::-webkit-scrollbar {
+	width: 7px;
+	height: 7px;
+}
+::-webkit-scrollbar-track {
+	background: white;
+	border-radius: var(--space-md);
+}
+::-webkit-scrollbar-track {
+	background: #272729;
+	border-radius: var(--space-md);
+}
+::-webkit-scrollbar-thumb {
+	background: #808080;;
+	border-radius: var(--space-md);
+	background-clip: padding-box; 
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #747474;
+	border-radius: var(--space-md);
+}

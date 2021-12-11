@@ -4,18 +4,32 @@
 <head>
    <meta charset="UTF-8">
    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+   <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
    <link href="../css/main.css" rel="stylesheet">
+   <link rel="stylesheet" href="../css/chessboard-1.0.0.min.css">
+   <script src="../js/chessboard-1.0.0.min.js"></script>
    <title>DeepChess</title>
+   <style>
+      #chessboard {
+         width: 500px;
+      }
+
+      div {
+         margin: auto;
+      }
+
+      .container {
+         margin: auto;
+      }
+   </style>
 </head>
 
 <body>
-
    <main>
       <h1 class="process">v.s. {enemy}</h1>
       <div>
          <div class="container">
-
+            <div id="chessboard"></div>
          </div>
       </div>
       <span id="bottom-note">Waiting for other player...</span>

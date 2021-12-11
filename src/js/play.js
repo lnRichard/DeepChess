@@ -10,3 +10,8 @@ for (let i = 0; i < process.length; i++) {
    const name = names[Math.floor(Math.random() * names.length)];
    process[i].innerHTML = process[i].innerHTML.replaceAll("{enemy}", `<span class="highlight">${name}</span>`);
 }
+
+const board = Chessboard("chessboard", {
+   draggable: true,
+});
+board.start();
