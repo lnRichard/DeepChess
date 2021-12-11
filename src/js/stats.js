@@ -1,6 +1,5 @@
 "use strict";
 /* eslint-disable no-undef */
-const fs = require('fs');
 document.getElementById("back-button").addEventListener("click", () => {
    window.location.href = "./menu.html";
 });

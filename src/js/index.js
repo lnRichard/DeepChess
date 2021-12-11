@@ -1,6 +1,5 @@
 "use strict";
 /* eslint-disable no-undef */
-const fs = require("fs");
 var request = {};
 var pairs = location.search.substring(1).split('&');
 for (var i = 0; i < pairs.length; i++) {

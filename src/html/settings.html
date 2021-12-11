@@ -6,6 +6,7 @@
    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
    <link href="../css/main.css" rel="stylesheet">
+   <script src="../js/_style.js"></script>
    <title>DeepChess</title>
 </head>
 
@@ -15,7 +16,21 @@
       <h1 class="process">Settings</h1>
       <div>
          <div class="container">
-            <h3>Unimplemented</h3>
+            <form action="">
+               <section>
+                  <fieldset>
+                     <div class="fieldset-item">
+                        <input id="hue" name="hue" type="number" min="0" max="255">
+                        <div class="sm-stack">
+                           <label for="hue" class="sm-stack">
+                              <h3>Hue</h3>
+                              <small>Hue color of the application</small>
+                           </label>
+                        </div>
+                     </div>
+                  </fieldset>
+               </section>
+            </form>
          </div>
       </div>
       <span id="bottom-note">Settings synced</span>

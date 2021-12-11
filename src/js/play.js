@@ -1,6 +1,11 @@
 "use strict";
 /* eslint-disable no-undef */
 document.getElementById("back-button").addEventListener("click", () => {
+	if (document.getElementById("back-button").innerHTML === "Forfeit") {
+		let stats = JSON.parse(fs.readFileSync("./data/stats.json"));
+		stats["losses"] += 1;
+		fs.writeFileSync("./data/stats.json", JSON.stringify(stats));
+	}
 	window.location.href = "./menu.html";
 });
 
@@ -46,6 +51,7 @@ function onDragStart(source, piece) {
 	}
 }
 
+var firstMove = true;
 function onDrop(source, target) {
 	removeHighlightSquares()
 
@@ -58,6 +64,13 @@ function onDrop(source, target) {
 
 	// illegal move
 	if (move === null) return 'snapback'
+
+	// Check if the first move was made
+	if (firstMove) {
+		console.log("First move");
+		document.getElementById("back-button").innerHTML = "Forfeit";
+		firstMove = false;
+	}
 
 	// AI move
 	setTimeout(function () { // TODO: Integrate AI and remove Timeout
@@ -113,15 +126,20 @@ function makeAIMove() {
 
 function checkEnd() {
 	if (game.game_over()) {
-		$("back-button").innerHTML = "Return";
+		let stats = JSON.parse(fs.readFileSync("./data/stats.json"));
+		document.getElementById("back-button").innerHTML = "Return";
 		if (game.turn() === 'w') {
 			$("#bottom-note").html("<h3 class='highlight'>You lose D:</h3>");
+			stats["losses"] += 1;
 		} else {
 			$("#bottom-note").html("<h3 class='highlight'>You win :D</h3>");
+			stats["wins"] += 1;
 		}
+		fs.writeFileSync("./data/stats.json", JSON.stringify(stats));
 	} else {
 		if (game.turn() === 'w') {
-			$("#bottom-note").html("<h3 class='highlight'>Your turn</h3>");
+			console.log(game.get_comments());
+			$("#bottom-note").html(`<h3 class='highlight'>Your turn</h3>`);
 		} else {
 			$("#bottom-note").html("<h3 class='highlight'>Their turn</h3>");
 		}

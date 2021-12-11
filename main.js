@@ -5,6 +5,7 @@ const {app, BrowserWindow, ipcMain, nativeTheme} = require('electron')
 const path = require('path')
 
 require('electron-reload')(__dirname, {
+  ignored: /data|[/\\]\./,
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
   hardResetMethod: 'exit'
 });
@@ -15,7 +16,7 @@ const root = "./data";
 
 mkDir(root);
 mkStore(root+"/account.json");
-mkStore(root+"/settings.json");
+mkStore(root+"/settings.json", JSON.stringify({hue: 200}));
 mkStore(root+"/stats.json", JSON.stringify({wins: 0, losses: 0, elo: 700}));
 
 function mkStore(path, json="{}") {

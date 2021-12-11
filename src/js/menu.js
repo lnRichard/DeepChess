@@ -1,6 +1,5 @@
 "use strict";
 /* eslint-disable no-undef */
-const fs = require('fs');
 const account = JSON.parse(fs.readFileSync('./data/account.json'));
 const username = account["username"];
 
