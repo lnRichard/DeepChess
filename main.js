@@ -55,7 +55,6 @@ function createWindow () {
     }
   })
 
-
   if (isLoggedIn() === true) {
     // Load the main.html if the user is logged in
     mainWindow.loadFile('./src/html/menu.html')

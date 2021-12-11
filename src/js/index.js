@@ -28,6 +28,7 @@ if (pair.length > 0) {
          console.log("Logging in...");
          var json_request = JSON.stringify(request);
          fs.writeFileSync("./data/account.json", json_request);
+         window.location.href = "./menu.html";
       }
    }
 }
