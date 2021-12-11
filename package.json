@@ -1,0 +1,27 @@
+{
+  "name": "deepchess",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron",
+    "chess",
+    "minimal",
+    "application",
+    "ai"
+  ],
+  "author": "Veldhoven van, Richard Et al.",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^16.0.2",
+    "eslint": "^8.4.1"
+  },
+  "dependencies": {
+    "electron-reload": "^2.0.0-alpha.1",
+    "yarn": "^1.22.17"
+  }
+}

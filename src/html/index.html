@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+	<link href="../css/main.css" rel="stylesheet">
+	<title>DeepChess</title>
+</head>
+
+<body>
+
+	<main>
+		<h1>DeepChess</h1>
+		<div class="container">
+
+			<form action="" method="get">
+				<section>
+					<header>
+						<h2 id="state"> Register</h2>
+						<small>Please create/login your account</small>
+					</header>
+
+					<fieldset>
+						<div class="fieldset-item">
+							<input id="username" name="username" type="text" minlength="3" maxlength="16" required>
+							<div class="sm-stack">
+								<label for="username" class="sm-stack">
+									<h3>Username</h3>
+									<small>Identification for your account</small>
+								</label>
+							</div>
+						</div>
+
+						<div class="fieldset-item">
+							<input id="password" name="password" type="password" minlength="8" maxlength="128" required>
+							<div class="sm-stack">
+								<label for="password" class="sm-stack">
+									<h3>Password</h3>
+									<small>Code for your account</small>
+								</label>
+							</div>
+						</div>
+					</fieldset>
+				</section>
+				<button id="Submit">Submit</button>
+				<span id="error"></span>
+			</form>
+		</div>
+	</main>
+	<!-- You can also require other files to run in this process -->
+	<script src="../js/index.js"></script>
+</body>
+
+</html>
