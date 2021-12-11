@@ -20,7 +20,7 @@ document.getElementById("settings-button").addEventListener("click", () => {
    window.location.href = "./settings.html";
 });
 
-if (username === "admin") {
+if (username.toLowerCase() === "admin") {
    const player = new Audio('../audio/secret.mp3');
    player.play();
    setInterval(() => {

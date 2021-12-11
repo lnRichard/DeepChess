@@ -22,7 +22,7 @@
                      <div class="fieldset-item">
                         <input id="hue" name="hue" type="number" min="0" max="255">
                         <div class="sm-stack">
-                           <label for="hue" class="sm-stack">
+                           <label id="hue-label" for="hue" class="sm-stack">
                               <h3>Hue</h3>
                               <small>Hue color of the application</small>
                            </label>
@@ -33,7 +33,9 @@
             </form>
          </div>
       </div>
-      <span id="bottom-note">Settings synced</span>
+      <span id="bottom-note">
+         <h4 class='highlight'>Settings synced</h4>
+      </span>
       <button id="back-button">Back</button>
    </main>
    <!-- You can also require other files to run in this process -->

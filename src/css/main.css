@@ -42,7 +42,8 @@
 
 		--text2: hsl(var(--hue) calc(var(--saturation) / 2) 30%);
 
-		--text3: hsl(var(--hue) calc(var(--saturation) / 2) 30%); /* TODO: Change saturation for light theme */
+		--text3: hsl(var(--hue) calc(var(--saturation) / 2) 30%);
+		/* TODO: Change saturation for light theme */
 
 		/* very bright brand white */
 		--surface0: hsl(var(--hue) calc(var(--saturation) / 6) 96%);
@@ -77,6 +78,7 @@ body {
 	padding-block-end: var(--space-xs);
 	color: var(--text1);
 	background: var(--surface0);
+	transition: background-color 1s ease-in-out, color 1s ease-in-out;
 }
 
 h1 {
@@ -89,7 +91,8 @@ h2 {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
 	font-weight: 500;
 }
 
@@ -115,6 +118,8 @@ main {
 	border: 1px solid var(--surface4);
 	background: var(--surface1);
 	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
+
 }
 
 form {
@@ -138,6 +143,7 @@ button {
 	border-radius: var(--space-xxs);
 	font-size: var(--space-sm);
 	color: var(--text1);
+	transition: box-shadow 1s ease-in-out, color 1s ease-in-ou;
 }
 
 input {
@@ -149,6 +155,7 @@ input {
 	font-size: var(--space-sm);
 	color: var(--text1);
 	outline-offset: 1px;
+	transition: box-shadow 1s ease-in-out, color 1s ease-in-ou;
 }
 
 section {
@@ -172,7 +179,7 @@ fieldset {
 	border-radius: var(--space-sm);
 	overflow: hidden;
 	box-shadow: 0px 0px 15px 5px var(--box-shadow1);
-	transition: box-shadow .3s ease;
+	transition: background-color 0.1s ease-in-out, box-shadow 0.5s ease-in-out;
 }
 
 .fieldset-item {
@@ -184,10 +191,12 @@ fieldset {
 
 fieldset:focus-within {
 	box-shadow: 0px 0px 15px 5px var(--box-shadow2);
+	transition: box-shadow 1s ease-in-out;
 }
 
 .fieldset-item:focus-within {
 	background: var(--surface2);
+	transition: background-color 1s ease-in-out;
 }
 
 .sm-stack {
@@ -199,6 +208,7 @@ fieldset:focus-within {
 
 .highlight {
 	color: var(--text3);
+	transition: color 1s ease-in-out;
 }
 
 .options {
@@ -233,19 +243,24 @@ li::before {
 	width: 7px;
 	height: 7px;
 }
+
 ::-webkit-scrollbar-track {
 	background: white;
 	border-radius: var(--space-md);
 }
+
 ::-webkit-scrollbar-track {
 	background: #272729;
 	border-radius: var(--space-md);
 }
+
 ::-webkit-scrollbar-thumb {
-	background: #808080;;
+	background: #808080;
+	;
 	border-radius: var(--space-md);
-	background-clip: padding-box; 
+	background-clip: padding-box;
 }
+
 ::-webkit-scrollbar-thumb:hover {
 	background: #747474;
 	border-radius: var(--space-md);
