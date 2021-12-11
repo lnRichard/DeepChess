@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="UTF-8">
+   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+   <link href="../css/main.css" rel="stylesheet">
+   <title>DeepChess</title>
+</head>
+
+<body>
+
+   <main>
+      <h1>Stats</h1>
+      <div>
+         <div class="container">
+            <li class="process">Wins: {wins}</li>
+            <li class="process">Losses: {losses}</li>
+            <li class="process">ELO: {elo}</li>
+         </div>
+      </div>
+      <span id="bottom-note">Stats synced</span>
+      <button id="back-button">Back</button>
+   </main>
+   <!-- You can also require other files to run in this process -->
+   <script src="../js/stats.js"></script>
+</body>
+
+</html>

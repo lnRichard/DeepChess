@@ -16,11 +16,11 @@ const root = "./data";
 mkDir(root);
 mkStore(root+"/account.json");
 mkStore(root+"/settings.json");
-mkStore(root+"/stats.json");
+mkStore(root+"/stats.json", JSON.stringify({wins: 0, losses: 0, elo: 700}));
 
-function mkStore(path) {
+function mkStore(path, json="{}") {
   if (!fs.existsSync(path)) {
-    fs.writeFileSync(path, "{}");
+    fs.writeFileSync(path, json);
   }
 }
 

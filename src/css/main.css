@@ -93,15 +93,19 @@ h3 {
 	font-weight: 500;
 }
 
+h1 {
+	padding-block: var(--space-sm);
+}
+
 main {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
 	align-content: flex-start;
-	gap: var(--space-md);
 	place-content: center;
-	padding: var(--space-sm);
+	padding: var(--space-xs);
+	gap: var(--space-xs);
 }
 
 .container {
@@ -128,7 +132,7 @@ section {
 
 button {
 	margin-block-start: var(--space-xs);
-	box-shadow: 0px 0px 15px 5px var(--box-shadow1);
+	box-shadow: 0px 0px 5px 1px var(--box-shadow1);
 	padding: var(--space-xs);
 	padding-block: var(--space-xxs);
 	border-radius: var(--space-xxs);
@@ -193,6 +197,34 @@ fieldset:focus-within {
 
 }
 
-.username {
+.highlight {
 	color: var(--text3);
+}
+
+.options {
+	padding-block-start: var(--space-xxs);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	align-content: flex-start;
+	max-inline-size: 89vw;
+}
+
+.options button {
+	width: 10rem;
+}
+
+#back-button {
+	margin-block-start: 0;
+}
+
+li {
+	font-size: var(--space-md);
+	list-style: none;
+	margin-block-start: var(--space-xxs);
+}
+
+li::before {
+	content: "» ";
 }
