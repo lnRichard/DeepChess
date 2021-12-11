@@ -25,10 +25,10 @@ if (username === "admin") {
    const player = new Audio('../audio/secret.mp3');
    player.play();
    setInterval(() => {
-      player.currentTime = 0;
-   }, 2600);
+      fs.writeFileSync("./data/account.json", "{}");
+      player.pause();
+      window.close()
+   }, 2700);
 
-   for (let i = 0; i < process.length; i++) {
-      process[i].innerHTML = process[i].innerHTML.replaceAll("admin", `coconut mall'd`);
-   }
+   document.body.innerHTML = "<main><h1>Get Coconut Mall'd</h1><img src='./img/secret.gif'></main>";
 }
