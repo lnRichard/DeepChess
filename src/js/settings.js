@@ -14,8 +14,8 @@ hue.addEventListener("change", () => {
    var value = parseInt(hue.value);
    if (value < 0) {
       value = 0;
-   } else if (value > 255) {
-      value = 255;
+   } else if (value > 360) {
+      value = 360;
    } else if (!value) {
       value = 0;
    }
@@ -27,8 +27,8 @@ hue.addEventListener("change", () => {
 });
 
 document.getElementById("hue-label").addEventListener("click", (e) => {
-   // Random integer from 0 to 255
-   const value = Math.floor(Math.random() * 256);
+   // Random integer from 0 to 360
+   const value = Math.floor(Math.random() * 361);
    hue.value = value;
    settings["hue"] = value;
    root.style.setProperty("--hue", value);
@@ -42,8 +42,8 @@ if (["chroma", "rainbow", "colors"].includes(username.toLowerCase())) {
          hue.value++;
          root.style.setProperty("--hue", hue.value);
          settings["hue"] = hue.value;
-         if (hue.value >= 255) {
-            hue.value = 255;
+         if (hue.value >= 360) {
+            hue.value = 360;
             up = false;
          }
       } else {
@@ -55,5 +55,5 @@ if (["chroma", "rainbow", "colors"].includes(username.toLowerCase())) {
             up = true;
          }
       }
-   }, 1);
+   }, 20);
 }
