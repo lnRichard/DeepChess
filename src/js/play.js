@@ -21,55 +21,20 @@ var stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 stockfish.postMessage("uci");
 stockfish.onmessage = function (event) {
 	if (event.data.includes("bestmove")) {
-		var check = setInterval(() => {
+		setTimeout(() => {
 			// Fetch move and type of the piece
-			const id = check;
 			const move = event.data.split(" ")[1];
+			const from = move.substring(0, 2);
+			const to = move.substring(2, 4);
 			const type = game.get(move.substring(0, 2))["type"].toUpperCase();
 			console.log(">TYPE: " + type);
 			console.log("[?] FOUND: " + move);
-			let possibleMoves = game.moves();
-
-			// Loop all possible moves
-			for (let i = 0; i < possibleMoves.length; i++) {
-
-				// Remove all unused chars
-				let local = possibleMoves[i].replaceAll("+", "").replaceAll("#", "");
-				let target = local;
-
-				// Process if needed
-				console.log(" |CHECKING: " + target);
-				if (target.length - 2 > 0) {
-					target = target.substring(target.length - 2);
-					console.log("  |PROCESS: " + target);
-				}
-
-				if (move.includes(target)) {
-					// Check if there is a conflict
-					if (local.includes("x")) {
-						if (local[0] === local[0].toUpperCase()) {
-							console.log("   |CHECK: Type A");
-							if (local[0] !== type) {
-								console.log("   |CONFLICT: Pass")
-								continue;
-							}
-						} else {
-							console.log("   |CHECK: Type B");
-							if (local[0] !== move[0]) {
-								console.log("   |CONFLICT: Pass")
-								continue;
-							}
-						}
-					}
-
-					console.log("[!] DOING THE MOVE: " + possibleMoves[i]);
-					game.move(possibleMoves[i]);
-					updateFen();
-					checkEnd();
-					clearInterval(id);
-					return;
-				}
-			}
+			console.log("[!] DOING THE MOVE: " + from + " -> " + to);
+			game.remove(from);
+			game.put({type: type, color: "b"}, to);
+			updateFen();
+			swapTurn();
+			checkEnd();
 		}, 500);
 	}
 }
@@ -83,6 +48,13 @@ let whiteSquareHighlight = '#a9a9a9';
 let blackSquareHighlight = '#696969';
 let whiteRedSquareHighlight = '#b59b9b';
 let blackRedSquareHighlight = '#785959';
+
+function swapTurn() {
+	let tokens = game.fen().split(" ");
+	tokens[1] = game.turn() === "b" ? "w" : "b";
+	tokens[3] = "-";
+	game.load(tokens.join(" "));
+}
 
 function updateFen() {
 	stockfish.postMessage("position fen " + game.fen());
