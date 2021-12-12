@@ -17,8 +17,11 @@ for (let i = 0; i < process.length; i++) {
 }
 
 // Stockfish
+var elo = JSON.parse(fs.readFileSync("./data/stats.json"))["elo"];
 var stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 stockfish.postMessage("uci");
+// stockfish.postMessage("setoption name UCI_LimitStrength value true");
+// stockfish.postMessage("setoption name UCI_Elo value " + elo);
 stockfish.onmessage = function (event) {
 	if (event.data.includes("bestmove")) {
 		setTimeout(() => {
