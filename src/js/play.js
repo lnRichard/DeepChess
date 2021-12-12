@@ -21,9 +21,12 @@ document.getElementById("promotion").addEventListener("change", function () {
 	promotion = this.value;
 });
 
+// User data
+// eslint-disable-next-line no-unused-vars
+var elo = JSON.parse(fs.readFileSync("./data/stats.json"))["elo"];
+
 // Stockfish
 var promotion = 'q';
-var elo = JSON.parse(fs.readFileSync("./data/stats.json"))["elo"];
 var stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 stockfish.postMessage("uci");
 // stockfish.postMessage("setoption name UCI_LimitStrength value true");
@@ -31,6 +34,10 @@ stockfish.postMessage("uci");
 stockfish.onmessage = function (event) {
 	if (event.data.includes("bestmove")) {
 		setTimeout(() => {
+			// Check for game over
+			var possibleMoves = game.moves()
+			if (possibleMoves.length === 0) return
+
 			// Fetch move and type of the piece
 			const move = event.data.split(" ")[1];
 			const from = move.substring(0, 2);
@@ -43,6 +50,7 @@ stockfish.onmessage = function (event) {
 				type = convert.toUpperCase();
 			}
 
+			// Make the move
 			console.log(">TYPE: " + type);
 			console.log("[?] FOUND: " + move);
 			console.log("[!] DOING THE MOVE: " + from + " -> " + to);
