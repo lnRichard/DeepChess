@@ -9,7 +9,7 @@ document.getElementById("back-button").addEventListener("click", () => {
 	window.location.href = "./menu.html";
 });
 
-var names = ["Niek", "Richard", "Jeremiah"];
+let names = ["Niek", "Richard", "Jeremiah"];
 let process = document.querySelectorAll(".process");
 for (let i = 0; i < process.length; i++) {
 	const name = names[Math.floor(Math.random() * names.length)];
@@ -20,21 +20,31 @@ for (let i = 0; i < process.length; i++) {
 // Chess:
 const $ = require('jquery');
 const Chess = require('chess.js').Chess;
-var board = null
-var game = new Chess()
-var whiteSquareHighlight = '#a9a9a9'
-var blackSquareHighlight = '#696969'
+let board = null;
+let game = new Chess();
+let whiteSquareHighlight = '#a9a9a9';
+let blackSquareHighlight = '#696969';
+let whiteRedSquareHighlight = '#b59b9b';
+let blackRedSquareHighlight = '#785959';
 
 function removeHighlightSquares() {
-	$('#chessboard .square-55d63').css('background', '')
+	$('#chessboard .square-55d63').css('background', '');
 }
 
 function highlightSquare(square) {
-	var $square = $('#chessboard .square-' + square)
+	let $square = $('#chessboard .square-' + square);
 
-	var background = whiteSquareHighlight
+	let background = whiteSquareHighlight;
 	if ($square.hasClass('black-3c85d')) {
-		background = blackSquareHighlight
+		background = blackSquareHighlight;
+	}
+
+	if (game.get(square) && game.get(square).color === 'b') {
+		if (background === whiteSquareHighlight) {
+			background = whiteRedSquareHighlight;
+		} else {
+			background = blackRedSquareHighlight;
+		}
 	}
 
 	$square.css('background', background)
@@ -51,12 +61,12 @@ function onDragStart(source, piece) {
 	}
 }
 
-var firstMove = true;
+let firstMove = true;
 function onDrop(source, target) {
 	removeHighlightSquares()
 
 	// see if the move is legal
-	var move = game.move({
+	let move = game.move({
 		from: source,
 		to: target,
 		promotion: 'q' // NOTE: always promote to a queen for example simplicity
@@ -67,7 +77,6 @@ function onDrop(source, target) {
 
 	// Check if the first move was made
 	if (firstMove) {
-		console.log("First move");
 		document.getElementById("back-button").innerHTML = "Forfeit";
 		firstMove = false;
 	}
@@ -81,7 +90,7 @@ function onDrop(source, target) {
 
 function onMouseoverSquare(square, piece) {
 	// get list of possible moves for this square
-	var moves = game.moves({
+	let moves = game.moves({
 		square: square,
 		verbose: true
 	})
@@ -99,7 +108,7 @@ function onMouseoverSquare(square, piece) {
 	highlightSquare(square)
 
 	// highlight the possible squares for this piece
-	for (var i = 0; i < moves.length; i++) {
+	for (let i = 0; i < moves.length; i++) {
 		highlightSquare(moves[i].to)
 	}
 }
@@ -113,13 +122,27 @@ function onSnapEnd() {
 }
 
 function makeAIMove() {
-	var possibleMoves = game.moves()
+	let possibleMoves = game.moves()
 
 	// game over
+	let moves = [];
 	if (possibleMoves.length === 0) return
+	for (let i = 0; i < possibleMoves.length; i++) {
+		// Remove all moves that do not take another piece
+		let move = possibleMoves[i];
+		if (move.length - 2 > 0) {
+			move = move.substring(move.length - 2);
+		}
 
-	var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-	game.move(possibleMoves[randomIdx])
+		if (game.get(move)) {
+			moves.push(possibleMoves[i]);
+		}
+	}
+
+	console.log(moves);
+	if (moves.length === 0) moves = game.moves();
+	let randomIdx = Math.floor(Math.random() * moves.length)
+	game.move(moves[randomIdx])
 	board.position(game.fen())
 	checkEnd();
 }
@@ -138,7 +161,6 @@ function checkEnd() {
 		fs.writeFileSync("./data/stats.json", JSON.stringify(stats));
 	} else {
 		if (game.turn() === 'w') {
-			console.log(game.get_comments());
 			$("#bottom-note").html(`<h3 class='highlight'>Your turn</h3>`);
 		} else {
 			$("#bottom-note").html("<h3 class='highlight'>Their turn</h3>");
