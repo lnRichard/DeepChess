@@ -16,7 +16,13 @@ for (let i = 0; i < process.length; i++) {
 	process[i].innerHTML = process[i].innerHTML.replaceAll("{enemy}", `<span class="highlight">${name}</span>`);
 }
 
+// Add promotion handling
+document.getElementById("promotion").addEventListener("change", function () {
+	promotion = this.value;
+});
+
 // Stockfish
+var promotion = 'q';
 var elo = JSON.parse(fs.readFileSync("./data/stats.json"))["elo"];
 var stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 stockfish.postMessage("uci");
@@ -113,7 +119,7 @@ function onDrop(source, target) {
 	let move = game.move({
 		from: source,
 		to: target,
-		promotion: 'q' // NOTE: always promote to a queen for example simplicity
+		promotion: promotion
 	})
 
 	// illegal move
