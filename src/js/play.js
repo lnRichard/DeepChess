@@ -16,6 +16,63 @@ for (let i = 0; i < process.length; i++) {
 	process[i].innerHTML = process[i].innerHTML.replaceAll("{enemy}", `<span class="highlight">${name}</span>`);
 }
 
+// Stockfish
+var stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
+stockfish.postMessage("uci");
+stockfish.onmessage = function (event) {
+	if (event.data.includes("bestmove")) {
+		var check = setInterval(() => {
+			// Fetch move and type of the piece
+			const id = check;
+			const move = event.data.split(" ")[1];
+			const type = game.get(move.substring(0, 2))["type"].toUpperCase();
+			console.log(">TYPE: " + type);
+			console.log("[?] FOUND: " + move);
+			let possibleMoves = game.moves();
+
+			// Loop all possible moves
+			for (let i = 0; i < possibleMoves.length; i++) {
+
+				// Remove all unused chars
+				let local = possibleMoves[i].replaceAll("+", "").replaceAll("#", "");
+				let target = local;
+
+				// Process if needed
+				console.log(" |CHECKING: " + target);
+				if (target.length - 2 > 0) {
+					target = target.substring(target.length - 2);
+					console.log("  |PROCESS: " + target);
+				}
+
+				if (move.includes(target)) {
+					// Check if there is a conflict
+					if (local.includes("x")) {
+						if (local[0] === local[0].toUpperCase()) {
+							console.log("   |CHECK: Type A");
+							if (local[0] !== type) {
+								console.log("   |CONFLICT: Pass")
+								continue;
+							}
+						} else {
+							console.log("   |CHECK: Type B");
+							if (local[0] !== move[0]) {
+								console.log("   |CONFLICT: Pass")
+								continue;
+							}
+						}
+					}
+
+					console.log("[!] DOING THE MOVE: " + possibleMoves[i]);
+					game.move(possibleMoves[i]);
+					updateFen();
+					checkEnd();
+					clearInterval(id);
+					return;
+				}
+			}
+		}, 500);
+	}
+}
 
 // Chess:
 const $ = require('jquery');
@@ -26,6 +83,11 @@ let whiteSquareHighlight = '#a9a9a9';
 let blackSquareHighlight = '#696969';
 let whiteRedSquareHighlight = '#b59b9b';
 let blackRedSquareHighlight = '#785959';
+
+function updateFen() {
+	stockfish.postMessage("position fen " + game.fen());
+	board.position(game.fen());
+}
 
 function removeHighlightSquares() {
 	$('#chessboard .square-55d63').css('background', '');
@@ -84,7 +146,7 @@ function onDrop(source, target) {
 	// AI move
 	setTimeout(function () { // TODO: Integrate AI and remove Timeout
 		makeAIMove();
-	}, Math.random() * 500 + 500);
+	}, 500);
 	checkEnd();
 }
 
@@ -118,33 +180,13 @@ function onMouseoutSquare() {
 }
 
 function onSnapEnd() {
-	board.position(game.fen())
+	updateFen();
 }
 
 function makeAIMove() {
-	let possibleMoves = game.moves()
-
-	// game over
-	let moves = [];
-	if (possibleMoves.length === 0) return
-	for (let i = 0; i < possibleMoves.length; i++) {
-		// Remove all moves that do not take another piece
-		let move = possibleMoves[i];
-		if (move.length - 2 > 0) {
-			move = move.substring(move.length - 2);
-		}
-
-		if (game.get(move)) {
-			moves.push(possibleMoves[i]);
-		}
-	}
-
-	console.log(moves);
-	if (moves.length === 0) moves = game.moves();
-	let randomIdx = Math.floor(Math.random() * moves.length)
-	game.move(moves[randomIdx])
-	board.position(game.fen())
-	checkEnd();
+	setTimeout(() => {
+		stockfish.postMessage("go depth 15");
+	}, 1000);
 }
 
 function checkEnd() {

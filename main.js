@@ -58,7 +58,7 @@ function createWindow () {
 
   if (isLoggedIn() === true) {
     // Load the main.html if the user is logged in
-    mainWindow.loadFile('./src/html/menu.html')
+    mainWindow.loadFile('./src/html/menu.html');
   } else {
     // or load the index.html of the app.
     mainWindow.loadFile('./src/html/index.html')
@@ -92,6 +92,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+app.commandLine.appendSwitch('enable-features', "SharedArrayBuffer")
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
