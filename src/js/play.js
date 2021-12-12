@@ -26,7 +26,14 @@ stockfish.onmessage = function (event) {
 			const move = event.data.split(" ")[1];
 			const from = move.substring(0, 2);
 			const to = move.substring(2, 4);
-			const type = game.get(move.substring(0, 2))["type"].toUpperCase();
+			const convert = move.substring(5, 5);
+			let type;
+			if (!convert) {
+				type = game.get(move.substring(0, 2))["type"].toUpperCase();
+			} else {
+				type = convert.toUpperCase();
+			}
+
 			console.log(">TYPE: " + type);
 			console.log("[?] FOUND: " + move);
 			console.log("[!] DOING THE MOVE: " + from + " -> " + to);
