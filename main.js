@@ -48,6 +48,7 @@ function createWindow () {
     height: 800,
     autoHideMenuBar: true,
     frame: true,
+    sandbox: true,
     webPreferences: {
       // preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
