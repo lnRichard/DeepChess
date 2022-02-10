@@ -598,8 +598,8 @@ function makeAIMove() {
 	// Generate move
 	setTimeout(() => {
 		// TODO: Use movetime along side depth
-		stockfish.postMessage(`go depth ${get_depth()} movetime 0.001`);
-	}, 1);
+		stockfish.postMessage(`go depth ${get_depth()}` /*+ ` movetime -1`*/);
+	}, 1000);
 }
 
 // The game ends
