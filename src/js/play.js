@@ -223,16 +223,8 @@ function turn_back_turn(turn) {
 		turn_id -= 1;
 		let turn = turn_history.pop(); // TODO: Modify to dict when using multiple branches
 		console.log("[!] Revering move: " + i);
-		console.log(`[*] {PLAYER} FROM: ${turn["PLAYER"]["FROM"]} (${turn["PLAYER"]["FROM_PIECE"]}) TO: ${turn["PLAYER"]["TO"]} (${turn["PLAYER"]["TO_PIECE"]})`);
-		console.log(`[*] {AI} FROM: ${turn["AI"]["FROM"]} (${turn["AI"]["FROM_PIECE"]}) TO: ${turn["AI"]["TO"]} (${turn["AI"]["TO_PIECE"]})`);
-
-		// Revert player move
-		game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
-		if (turn["PLAYER"]["TO_PIECE"]) {
-			game.put(turn["PLAYER"]["TO_PIECE"], turn["PLAYER"]["TO"]);
-		} else {
-			game.remove(turn["PLAYER"]["TO"]);
-		}
+		console.log("[*] {PLAYER} FROM: ", turn["PLAYER"]["FROM"], turn["PLAYER"]["FROM_PIECE"], " TO: ", turn["PLAYER"]["TO"], turn["PLAYER"]["TO_PIECE"]);
+		console.log("[*] {AI} FROM: ", turn["AI"]["FROM"], turn["AI"]["FROM_PIECE"], " TO: ", turn["AI"]["TO"], turn["AI"]["TO_PIECE"]);
 
 		// Revert AI move
 		game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
@@ -240,6 +232,14 @@ function turn_back_turn(turn) {
 			game.put(turn["AI"]["TO_PIECE"], turn["AI"]["TO"]);
 		} else {
 			game.remove(turn["AI"]["TO"]);
+		}
+
+		// Revert player move
+		game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
+		if (turn["PLAYER"]["TO_PIECE"]) {
+			game.put(turn["PLAYER"]["TO_PIECE"], turn["PLAYER"]["TO"]);
+		} else {
+			game.remove(turn["PLAYER"]["TO"]);
 		}
 
 		// Update game state
@@ -252,7 +252,7 @@ function turn_back_turn(turn) {
 
 // Get piece type
 function piece_from(pos) {
-	return game.get(pos) ? game.get(pos) : null;
+	return game.get(pos)
 }
 
 
@@ -291,7 +291,7 @@ stockfish.onmessage = function (event) {
 					// Make the move
 					let from_piece = piece_from(from);
 					let to_piece = piece_from(to);
-					console.log("[!] AI MOVE: " + from + " -> " + to);
+					console.log("[!] AI MOVE: ", from, " -> ", to);
 					game.remove(from);
 					game.put({type: type, color: "b"}, to);
 
@@ -601,12 +601,12 @@ board = Chessboard('chessboard', config)
 // TODO: Show text hints on the screen, next to the board
 // TODO: Timer for the game and AI
 // TODO: Save and load games
-// TODO: Turning back turns
+// TODO: Turning back turns [x]
 // TODO: Defining starting positions/puzzles
 // TODO: Custom AI difficulty, outside of it automatically adjusting
-// TODO: Add bar on top of page, where you can go back to previous turns
+// TODO: Add bar on top of page, where you can go back to previous turns [x]
 // TODO: Allow branching in bar, by keeping different turn tracks
-// TODO: Ability to get list of best moves instead of only the best move3
+// TODO: Ability to get list of best moves instead of only the best move
 // TODO: Add opening display, where you can try different openings
 // TODO: Protect app from security vulnerabilities
 // TODO: Show arrows based on pawn moves on the board
