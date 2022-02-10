@@ -158,6 +158,14 @@ input {
 	transition: box-shadow 1s ease-in-out, color 1s ease-in-ou;
 }
 
+.positive {
+	color: #6cdd96;
+}
+
+.negative {
+	color: #dd6c6c;
+}
+
 section {
 	display: grid;
 	gap: var(--space-sm);
@@ -229,6 +237,10 @@ fieldset:focus-within {
 	margin-block-start: 0;
 }
 
+#hint-button {
+	margin-block-start: 0;
+}
+
 li {
 	font-size: var(--space-md);
 	list-style: none;
@@ -264,4 +276,37 @@ li::before {
 ::-webkit-scrollbar-thumb:hover {
 	background: #747474;
 	border-radius: var(--space-md);
+}
+
+#history_container {
+	display: flex;
+	width: 60%;
+	max-width: 60%;
+	overflow-x: scroll;
+	flex-wrap: nowrap;
+	max-height: 3rem;
+	overflow-y: hidden;
+	white-space: nowrap;
+}
+
+#history {
+	width: 100%;
+	white-space: nowrap;
+}
+
+.turn {
+	width: 6.5rem;
+	height: 2.5rem;
+	font-size: smaller;
+	border: 1px solid var(--surface4);
+	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
+	display: inline-block;
+	cursor: pointer;
+}
+
+#buttons {
+	gap: 10px;
+	display: flex;
+	justify-content: center;
+	width: 100%;
 }

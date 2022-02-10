@@ -27,7 +27,11 @@
 
 <body>
    <main>
-      <h1 class="process">v.s. {enemy}</h1>
+      <h2>History</h2>
+      <div id="history_container">
+         <div id="history"></div>
+      </div>
+      <!-- <h1 class="process">v.s. {enemy}</h1> -->
       <div>
          <div class="container">
             <div id="chessboard"></div>
@@ -41,11 +45,13 @@
             <option value="r">Rook</option>
             <option value="b">Bishop</option>
          </select>
+         <span class="highlight">Evaluation: </span>
+         <span id="evaluation" class="positive">0</span> {<span id="elo_mod" class="positive">+0</span>}
       </div>
       <span id="bottom-note">
          <h3 class='highlight'>Your turn</h3>
       </span>
-      <button id="back-button">Return</button>
+      <span id="buttons"><button id="back-button">Return</button><button id="hint-button">Hint</button></span>
    </main>
    <!-- You can also require other files to run in this process -->
    <script src="../js/play.js"></script>
