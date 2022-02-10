@@ -36,11 +36,6 @@ document.getElementById("hint-button").addEventListener("click", function () {
 
 // Add back button functionality
 document.getElementById("back-button").addEventListener("click", () => {
-	if (document.getElementById("back-button").innerHTML === "Forfeit") {
-		let stats = JSON.parse(fs.readFileSync("./data/stats.json"));
-		stats["losses"] += 1;
-		fs.writeFileSync("./data/stats.json", JSON.stringify(stats));
-	}
 	window.location.href = "./menu.html";
 });
 
@@ -211,12 +206,13 @@ function remove_latest_eval() {
 // Turn back turn
 // eslint-disable-next-line no-unused-vars
 function turn_back_turn(turn) {
-	if (ai_moving || ai_hint || freeze) {
+	if ((ai_moving || ai_hint || freeze) && !game.game_over()) {
 		console.log("[!] Cannot back turn while AI is moving or hinting");
 		return
 	}
 
 	// Back turn
+	$("#bottom-note").html("<h3 class='highlight'>Your turn</h3>");
 	console.log("\n[!] Backing turn to: ", turn);
 	for (let i = turn_id; i >= turn; i--) {
 		// Log reversions
@@ -227,26 +223,30 @@ function turn_back_turn(turn) {
 		console.log("[*] {AI} FROM: ", turn["AI"]["FROM"], turn["AI"]["FROM_PIECE"], " TO: ", turn["AI"]["TO"], turn["AI"]["TO_PIECE"]);
 
 		// Revert AI move
-		game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
 		if (turn["AI"]["TO_PIECE"]) {
 			game.put(turn["AI"]["TO_PIECE"], turn["AI"]["TO"]);
 		} else {
 			game.remove(turn["AI"]["TO"]);
 		}
+		game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
 
 		// Revert player move
-		game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
 		if (turn["PLAYER"]["TO_PIECE"]) {
 			game.put(turn["PLAYER"]["TO_PIECE"], turn["PLAYER"]["TO"]);
 		} else {
 			game.remove(turn["PLAYER"]["TO"]);
 		}
+		game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
 
 		// Update game state
 		document.getElementById(`turn-${i}`).remove();
 		remove_latest_eval();
 		updateFen();
 		checkEnd();
+		ai_moving = false;
+		if (game.turn() === 'b') {
+			game.swapTurn()
+		}
 	}
 }
 
@@ -264,8 +264,20 @@ function parse_type1_eval(type1, type="Undefined") {
 	let mg_black_eval = black_eval.replaceAll("  ", " ").split(" ")[0].trim();
 	let eg_black_eval = black_eval.replaceAll("  ", " ").split(" ")[1].trim();
 
-	console.log(`[*] White ${type} Evaluation: {MG: ` + mg_white_eval + ", EG: " + eg_white_eval + "}");
-	console.log(`[*] Black ${type} Evaluation: {MG: ` + mg_black_eval + ", EG: " + eg_black_eval + "}");
+	// Update fields
+	// console.log(`[*] White ${type} Evaluation: {MG: ` + mg_white_eval + ", EG: " + eg_white_eval + "}");
+	// console.log(`[*] Black ${type} Evaluation: {MG: ` + mg_black_eval + ", EG: " + eg_black_eval + "}");
+	if (mg_white_eval - mg_black_eval <= -0.25) {
+		console.log(`[*] WARNING: Weak MG ${type} evaluation {${Math.round((mg_white_eval - mg_black_eval) * 100) / 100} < -0.25}`);
+	} else if (mg_white_eval - mg_black_eval >= 0.25) {
+		console.log(`[*] WARNING: Strong MG ${type} evaluation {${Math.round((mg_white_eval - mg_black_eval) * 100) / 100} > 0.25}`);
+	}
+	if (eg_white_eval - eg_black_eval <= -0.25) {
+		console.log(`[*] WARNING: Weak EG ${type} evaluation {${Math.round((eg_white_eval - eg_black_eval) * 100) / 100} < -0.25}`);
+	} else if (eg_white_eval - eg_black_eval >= 0.25) {
+		console.log(`[*] WARNING: Strong EG ${type} evaluation {${Math.round((eg_white_eval - eg_black_eval) * 100) / 100} > 0.25}`);
+	}
+
 	return [mg_white_eval, eg_white_eval, mg_black_eval, eg_black_eval]
 }
 
@@ -312,7 +324,6 @@ stockfish.onmessage = function (event) {
 					// Update game state
 					updateFen();
 					swapTurn();
-					checkEnd();
 
 					// Update turn history display
 					latest_turn = {
@@ -332,6 +343,7 @@ stockfish.onmessage = function (event) {
 
 					// Update state
 					ai_moving = false
+					checkEnd();
 				} catch (ex) {
 					// Retry
 					stockfish.postMessage("go depth " + get_depth());
@@ -498,7 +510,7 @@ function highlightSquare(square) {
 // Drag piece
 function onDragStart(source, piece) {
 	// do not pick up pieces if the game is over
-	if (game.game_over() || freeze || ai_moving || ai_hint) return false
+	if (game.game_over() || freeze || ai_moving || ai_hint) return false;
 
 	// or if it's not that side's turn
 	if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
@@ -586,24 +598,20 @@ function makeAIMove() {
 	// Generate move
 	setTimeout(() => {
 		// TODO: Use movetime along side depth
-		stockfish.postMessage(`go depth ${get_depth()}`);
-	}, 1000);
+		stockfish.postMessage(`go depth ${get_depth()} movetime 0.001`);
+	}, 1);
 }
 
 // The game ends
 function checkEnd() {
 	if (game.game_over()) {
 		// Game is over
-		let stats = JSON.parse(fs.readFileSync("./data/stats.json"));
 		document.getElementById("back-button").innerHTML = "Return";
 		if (game.turn() === 'w') {
 			$("#bottom-note").html("<h3 class='highlight'>You lose D:</h3>");
-			stats["losses"] += 1;
 		} else {
 			$("#bottom-note").html("<h3 class='highlight'>You win :D</h3>");
-			stats["wins"] += 1;
 		}
-		fs.writeFileSync("./data/stats.json", JSON.stringify(stats));
 	} else {
 		// Game is not over
 		if (game.turn() === 'w') {
@@ -628,6 +636,7 @@ var config = {
 // Start the game by creating the board
 board = Chessboard('chessboard', config)
 
+// TODO: Fix rookering en en passant turn back time to the good old days
 // TODO: Add move time mechanic
 // TODO: Balance AI difficulty
 // TODO: Add full evaluation of board [x]
@@ -649,6 +658,7 @@ board = Chessboard('chessboard', config)
 // TODO: Try to rationalize the AI, by showing the next few move the hint would make as well
 // TODO: Show moves towards check by M1, M2, etc.
 // *TODO: Find move variations, and show them on the board
+// TODO: Type 2 evaluation system
 
 /* Default values at the beginning of the game
 [*] White Pawn Evaluation: {MG: 0.38, EG: -0.08}

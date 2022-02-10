@@ -17,7 +17,7 @@ const root = "./data";
 mkDir(root);
 mkStore(root+"/account.json");
 mkStore(root+"/settings.json", JSON.stringify({hue: 200}));
-mkStore(root+"/stats.json", JSON.stringify({wins: 0, losses: 0, elo: 700.0}));
+mkStore(root+"/stats.json", JSON.stringify({elo: 700.0}));
 
 function mkStore(path, json="{}") {
   if (!fs.existsSync(path)) {

@@ -26,6 +26,7 @@
 	--surface2: hsl(var(--hue) 10% 15%);
 	--surface3: hsl(var(--hue) 5% 20%);
 	--surface4: hsl(var(--hue) 5% 25%);
+	--surface5: hsl(var(--hue) 11% 9%);
 
 	--box-shadow1: hsl(var(--hue) 10% 11%);
 	--box-shadow2: hsl(var(--hue) 10% 12%);
@@ -310,4 +311,32 @@ li::before {
 	display: flex;
 	justify-content: center;
 	width: 100%;
+}
+
+.sub-container {
+	width: 25vw;
+	height: 40vw;
+	max-width: 40vw;
+	display: block;
+	border-radius: 5px;
+	padding: var(--space-xl);
+	padding-block-end: var(--space-xxl);
+	border-radius: var(--space-sm);
+	border: 1px solid var(--surface4);
+	background: var(--surface5);
+	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
+	display: flex;
+}
+
+.left {
+	position: absolute;
+	left: 1vw;
+	top: 7vw;
+}
+
+.right {
+	position: absolute;
+	right: 1vw;
+	top: 7vw;
 }

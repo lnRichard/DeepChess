@@ -26,7 +26,7 @@ hue.addEventListener("change", () => {
    fs.writeFileSync("./data/settings.json", JSON.stringify(settings));
 });
 
-document.getElementById("hue-label").addEventListener("click", (e) => {
+document.getElementById("hue-label").addEventListener("click", () => {
    // Random integer from 0 to 360
    const value = Math.floor(Math.random() * 361);
    hue.value = value;
