@@ -255,6 +255,20 @@ function piece_from(pos) {
 	return game.get(pos)
 }
 
+// Type 1 eval
+function parse_type1_eval(type1, type="Undefined") {
+	let white_eval = type1.split("|")[2].trim();
+	let black_eval = type1.split("|")[3].trim();
+	let mg_white_eval = white_eval.replaceAll("  ", " ").split(" ")[0].trim();
+	let eg_white_eval = white_eval.replaceAll("  ", " ").split(" ")[1].trim();
+	let mg_black_eval = black_eval.replaceAll("  ", " ").split(" ")[0].trim();
+	let eg_black_eval = black_eval.replaceAll("  ", " ").split(" ")[1].trim();
+
+	console.log(`[*] White ${type} Evaluation: {MG: ` + mg_white_eval + ", EG: " + eg_white_eval + "}");
+	console.log(`[*] Black ${type} Evaluation: {MG: ` + mg_black_eval + ", EG: " + eg_black_eval + "}");
+	return [mg_white_eval, eg_white_eval, mg_black_eval, eg_black_eval]
+}
+
 
 // AI MOVE HANDLING
 
@@ -372,6 +386,26 @@ stockfish.onmessage = function (event) {
 
 		// Update turn
 		update_turn_history(latest_turn);
+	} else if (event.data.includes("Pawns")) {
+		let type1 = parse_type1_eval(event.data, "Pawn");
+	} else if (event.data.includes("Knights")) {
+		let type1 = parse_type1_eval(event.data, "Knight");
+	} else if (event.data.includes("Bishops")) {
+		let type1 = parse_type1_eval(event.data, "Bishop")
+	} else if (event.data.includes("Rooks")) {
+		let type1 = parse_type1_eval(event.data, "Rook")
+	} else if (event.data.includes("Queens")) {
+		let type1 = parse_type1_eval(event.data, "Queen")
+	} else if (event.data.includes("Mobility")) {
+		let type1 = parse_type1_eval(event.data, "Mobility")
+	} else if (event.data.includes("King safety")) {
+		let type1 = parse_type1_eval(event.data, "King safety")
+	} else if (event.data.includes("Threats")) {
+		let type1 = parse_type1_eval(event.data, "Threat")
+	} else if (event.data.includes("Passed")) {
+		let type1 = parse_type1_eval(event.data, "Passed")
+	} else if (event.data.includes("Space")) {
+		let type1 = parse_type1_eval(event.data, "Space")
 	}
 }
 
@@ -596,22 +630,46 @@ board = Chessboard('chessboard', config)
 
 // TODO: Add move time mechanic
 // TODO: Balance AI difficulty
-// TODO: Add full evaluation of board
+// TODO: Add full evaluation of board [x]
 // TODO: Give player hints based on the full evaluation of the board
 // TODO: Show text hints on the screen, next to the board
 // TODO: Timer for the game and AI
-// TODO: Save and load games
+// TODO: Save and load games (Use clipboard)
 // TODO: Turning back turns [x]
 // TODO: Defining starting positions/puzzles
 // TODO: Custom AI difficulty, outside of it automatically adjusting
 // TODO: Add bar on top of page, where you can go back to previous turns [x]
-// TODO: Allow branching in bar, by keeping different turn tracks
+// *TODO: Allow branching in bar, by keeping different turn tracks
 // TODO: Ability to get list of best moves instead of only the best move
 // TODO: Add opening display, where you can try different openings
 // TODO: Protect app from security vulnerabilities
-// TODO: Show arrows based on pawn moves on the board
+// *TODO: Show arrows based on pawn moves on the board
 // TODO: Show what pieces are attacking each other for the current position
 // TODO: Visualize current game rating as a progress bar (White v.s. Black)
 // TODO: Try to rationalize the AI, by showing the next few move the hint would make as well
 // TODO: Show moves towards check by M1, M2, etc.
-// TODO: Find move variations, and show them on the board
+// *TODO: Find move variations, and show them on the board
+
+/* Default values at the beginning of the game
+[*] White Pawn Evaluation: {MG: 0.38, EG: -0.08}
+[*] Black Pawn Evaluation: {MG: 0.38, EG: -0.08}
+[*] White Knight Evaluation: {MG: -0.02, EG: -0.19}
+[*] Black Knight Evaluation: {MG: -0.02, EG: -0.19}
+[*] White Bishop Evaluation: {MG: 0.01, EG: -0.41}
+[*] Black Bishop Evaluation: {MG: 0.01, EG: -0.41}
+[*] White Rook Evaluation: {MG: -0.26, EG: -0.06}
+[*] Black Rook Evaluation: {MG: -0.26, EG: -0.06}
+[*] White Queen Evaluation: {MG: 0.00, EG: 0.00}
+[*] Black Queen Evaluation: {MG: 0.00, EG: 0.00}
+[*] White Mobility Evaluation: {MG: -0.88, EG: -1.15}
+[*] Black Mobility Evaluation: {MG: -0.88, EG: -1.15}
+[*] White King safety Evaluation: {MG: 0.91, EG: -0.10}
+[*] Black King safety Evaluation: {MG: 0.91, EG: -0.10}
+[*] White Threat Evaluation: {MG: 0.00, EG: 0.00}
+[*] Black Threat Evaluation: {MG: 0.00, EG: 0.00}
+[*] White Passed Evaluation: {MG: 0.00, EG: 0.00}
+[*] Black Passed Evaluation: {MG: 0.00, EG: 0.00}
+[*] White Space Evaluation: {MG: 0.40, EG: 0.00}
+[*] Black Space Evaluation: {MG: 0.40, EG: 0.00}
+[*] Evaluation: 0.31 {white}
+*/
