@@ -32,8 +32,84 @@
          <div id="history"></div>
       </div>
       <!-- <h1 class="process">v.s. {enemy}</h1> -->
-      <div class="left sub-container"></div>
-      <div class="right sub-container"></div>
+      <div class="left sub-container">
+         <h2>MID-GAME</h2>
+         <br>
+         <h3>Pieces</h3>
+         <hr>
+         <div id="mg-pawn-strength-container">
+            Pawn strength: <span id="mg-pawn-strength" class="neutral">0</span>
+         </div>
+         <div id="mg-knight-strength-container">
+            Knight strength: <span id="mg-knight-strength" class="neutral">0</span>
+         </div>
+         <div id="mg-bishop-strength-container">
+            Bishop strength: <span id="mg-bishop-strength" class="neutral">0</span>
+         </div>
+         <div id="mg-rook-strength-container">
+            Rook strength: <span id="mg-rook-strength" class="neutral">0</span>
+         </div>
+         <div id="mg-queen-strength-container">
+            Queen strength: <span id="mg-queen-strength" class="neutral">0</span>
+         </div>
+         <div id="mg-king-safety-container">
+            King safety: <span id="mg-king-safety" class="neutral">0</span>
+         </div>
+         <br>
+         <h3>Board</h3>
+         <hr>
+         <div id="mg-mobility-container">
+            Piece mobility: <span id="mg-mobility" class="neutral">0</span>
+         </div>
+         <div id="mg-threat-container">
+            Piece threat: <span id="mg-threat" class="neutral">0</span>
+         </div>
+         <div id="mg-space-container">
+            Piece space: <span id="mg-space" class="neutral">0</span>
+         </div>
+         <div id="mg-passed-container">
+            Passed pawns: <span id="mg-passed" class="neutral">0</span>
+         </div>
+      </div>
+      <div class="right sub-container">
+         <h2>END-GAME</h2>
+         <br>
+         <h3>Pieces</h3>
+         <hr>
+         <div id="eg-pawn-strength-container">
+            Pawn strength: <span id="eg-pawn-strength" class="neutral">0</span>
+         </div>
+         <div id="eg-knight-strength-container">
+            Knight strength: <span id="eg-knight-strength" class="neutral">0</span>
+         </div>
+         <div id="eg-bishop-strength-container">
+            Bishop strength: <span id="eg-bishop-strength" class="neutral">0</span>
+         </div>
+         <div id="eg-rook-strength-container">
+            Rook strength: <span id="eg-rook-strength" class="neutral">0</span>
+         </div>
+         <div id="eg-queen-strength-container">
+            Queen strength: <span id="eg-queen-strength" class="neutral">0</span>
+         </div>
+         <div id="eg-king-safety-container">
+            King safety: <span id="eg-king-safety" class="neutral">0</span>
+         </div>
+         <br>
+         <h3>Board</h3>
+         <hr>
+         <div id="eg-mobility-container">
+            Piece mobility: <span id="eg-mobility" class="neutral">0</span>
+         </div>
+         <div id="eg-threat-container">
+            Piece threat: <span id="eg-threat" class="neutral">0</span>
+         </div>
+         <div id="eg-space-container">
+            Piece space: <span id="eg-space" class="neutral">0</span>
+         </div>
+         <div id="eg-passed-container">
+            Passed pawns: <span id="eg-passed" class="neutral">0</span>
+         </div>
+      </div>
       <div>
          <div class="container">
             <div id="chessboard"></div>
@@ -48,7 +124,7 @@
             <option value="b">Bishop</option>
          </select>
          <span class="highlight">Evaluation: </span>
-         <span id="evaluation" class="positive">0</span> {<span id="elo_mod" class="positive">+0</span>}
+         <span id="evaluation" class="neutral">0</span> {<span id="elo_mod" class="neutral">+0</span>}
       </div>
       <span id="bottom-note">
          <h3 class='highlight'>Your turn</h3>

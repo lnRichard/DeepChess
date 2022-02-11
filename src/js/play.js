@@ -136,26 +136,53 @@ function add_elo(amount) {
 
 // Modify field
 function modify_field_highlight(field, value) {
-	if (value >= 0) {
+	if (value > 0) {
 		field.classList.add("positive");
 		field.classList.remove("negative");
-	} else {
+		field.classList.remove("neutral");
+	} else if (value < 0) {
 		field.classList.add("negative");
 		field.classList.remove("positive");
+		field.classList.remove("neutral");
+	} else {
+		field.classList.add("neutral");
+		field.classList.remove("positive");
+		field.classList.remove("negative");
 	}
 }
+
+// Update field
+function update_numeric_field(field_id, value) {
+	let field = document.getElementById(field_id);
+	field.innerHTML = Math.round(value * 100) / 100;
+	if (value > 0) {
+		field.classList.add("positive");
+		field.classList.remove("negative");
+		field.classList.remove("neutral");
+	} else if (value < 0) {
+		field.classList.add("negative");
+		field.classList.remove("positive");
+		field.classList.remove("neutral");
+	} else {
+		field.classList.add("neutral");
+		field.classList.remove("positive");
+		field.classList.remove("negative");
+	}
+}
+
 
 // Update turn history
 function update_turn_history(turn) {
 	turn_id += 1;
 	turn_history.push(turn);
 	let positive = (get_elo_mod(turn_id) >= 0)
+	let neutral = (get_elo_mod(turn_id) == 0)
 
 	turn_history_field.innerHTML += /*html*/`
 	<div class="turn" id="turn-${turn_id}"><span>${turn_id}. </span>
-		AI: <span class=${positive ? "negative" : "positive"}>${turn["AI"]["FROM"]} -> ${turn["AI"]["TO"]}</span>
+		AI: <span class=${neutral ? "neutral" : positive ? "negative" : "positive"}>${turn["AI"]["FROM"]} -> ${turn["AI"]["TO"]}</span>
 		<br>
-		Player: <span class=${positive ? "positive" : "negative"}>${turn["PLAYER"]["FROM"]} -> ${turn["PLAYER"]["TO"]}</span>
+		Player: <span class=${neutral ? "neutral" : positive ? "positive" : "negative"}>${turn["PLAYER"]["FROM"]} -> ${turn["PLAYER"]["TO"]}</span>
 	</div>
 	`
 
@@ -217,30 +244,65 @@ function turn_back_turn(turn) {
 	for (let i = turn_id; i >= turn; i--) {
 		// Log reversions
 		turn_id -= 1;
-		let turn = turn_history.pop(); // TODO: Modify to dict when using multiple branches
+		let turn = turn_history.pop();
 		console.log("[!] Revering move: " + i);
-		console.log("[*] {PLAYER} FROM: ", turn["PLAYER"]["FROM"], turn["PLAYER"]["FROM_PIECE"], " TO: ", turn["PLAYER"]["TO"], turn["PLAYER"]["TO_PIECE"]);
-		console.log("[*] {AI} FROM: ", turn["AI"]["FROM"], turn["AI"]["FROM_PIECE"], " TO: ", turn["AI"]["TO"], turn["AI"]["TO_PIECE"]);
 
 		// Revert AI move
-		if (turn["AI"]["TO_PIECE"]) {
-			game.put(turn["AI"]["TO_PIECE"], turn["AI"]["TO"]);
-		} else {
-			game.remove(turn["AI"]["TO"]);
+		if (!turn["AI"]["CASTLING"]) {
+			console.log("[*] {AI} FROM: ", turn["AI"]["FROM"], turn["AI"]["FROM_PIECE"], " TO: ", turn["AI"]["TO"], turn["AI"]["TO_PIECE"]);
+			if (turn["AI"]["TO_PIECE"]) {
+				game.put(turn["AI"]["TO_PIECE"], turn["AI"]["TO"]);
+			} else {
+				game.remove(turn["AI"]["TO"]);
+			}
+
+			game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
+		} else if (turn["AI"]["CASTLING"]) {
+			if (turn["AI"]["CASTLING"] == "O-O") {
+				console.log("[*] {AI} O-O");
+				game.remove("g8");
+				game.remove("f8");
+				game.put({ type: "k", color: 'b' }, "e8");
+				game.put({ type: "r", color: 'b' }, "h8");
+			} else {
+				console.log("[*] {AI} O-O-O");
+				game.remove("b8");
+				game.remove("c8");
+				game.put({ type: "k", color: 'b' }, "e8");
+				game.put({ type: "r", color: 'b' }, "a8");
+			}
 		}
-		game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
 
 		// Revert player move
-		if (turn["PLAYER"]["TO_PIECE"]) {
-			game.put(turn["PLAYER"]["TO_PIECE"], turn["PLAYER"]["TO"]);
-		} else {
-			game.remove(turn["PLAYER"]["TO"]);
+		if (!turn["PLAYER"]["CASTLING"]) {
+			console.log("[*] {PLAYER} FROM: ", turn["PLAYER"]["FROM"], turn["PLAYER"]["FROM_PIECE"], " TO: ", turn["PLAYER"]["TO"], turn["PLAYER"]["TO_PIECE"]);
+			if (turn["PLAYER"]["TO_PIECE"]) {
+				game.put(turn["PLAYER"]["TO_PIECE"], turn["PLAYER"]["TO"]);
+			} else {
+				game.remove(turn["PLAYER"]["TO"]);
+			}
+
+			game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
+		} else if (turn["PLAYER"]["CASTLING"]) {
+			if (turn["PLAYER"]["CASTLING"] == "O-O") {
+				console.log("[*] {PLAYER} O-O");
+				game.remove("g1");
+				game.remove("f1");
+				game.put({ type: "k", color: 'w' }, "e1");
+				game.put({ type: "r", color: 'w' }, "h1");
+			} else {
+				console.log("[*] {PLAYER} O-O-O");
+				game.put({ type: "k", color: 'w' }, "e1");
+				game.put({ type: "r", color: 'w' }, "a1");
+				game.remove("b1");
+				game.remove("c1");
+			}
 		}
-		game.put(turn["PLAYER"]["FROM_PIECE"], turn["PLAYER"]["FROM"]);
 
 		// Update game state
 		document.getElementById(`turn-${i}`).remove();
 		remove_latest_eval();
+		game.put(turn["AI"]["FROM_PIECE"], turn["AI"]["FROM"]);
 		updateFen();
 		checkEnd();
 		ai_moving = false;
@@ -278,7 +340,7 @@ function parse_type1_eval(type1, type="Undefined") {
 		console.log(`[*] WARNING: Strong EG ${type} evaluation {${Math.round((eg_white_eval - eg_black_eval) * 100) / 100} > 0.25}`);
 	}
 
-	return [mg_white_eval, eg_white_eval, mg_black_eval, eg_black_eval]
+	return [parseFloat(mg_white_eval), parseFloat(eg_white_eval), parseFloat(mg_black_eval), parseFloat(eg_black_eval)]
 }
 
 
@@ -325,6 +387,18 @@ stockfish.onmessage = function (event) {
 					updateFen();
 					swapTurn();
 
+					// Set last player move
+					let castling = null;
+					if (from_piece["type"].toLowerCase() == "k") {
+						if (to === "g1") {
+							castling = "O-O";
+							console.log("[*] Castling: O-O");
+						} else if (to === "c1") {
+							castling = "O-O-O";
+							console.log("[*] Castling: O-O-O");
+						}
+					}
+
 					// Update turn history display
 					latest_turn = {
 						"PLAYER": last_player_move,
@@ -334,6 +408,7 @@ stockfish.onmessage = function (event) {
 							"FROM_PIECE": from_piece,
 							"TO_PIECE": to_piece,
 							"PROMOTION": type,
+							"CASTLING": castling,
 						}
 					}
 
@@ -399,25 +474,45 @@ stockfish.onmessage = function (event) {
 		// Update turn
 		update_turn_history(latest_turn);
 	} else if (event.data.includes("Pawns")) {
-		let type1 = parse_type1_eval(event.data, "Pawn");
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Pawn");
+		update_numeric_field("mg-pawn-strength", (w_mg - b_mg));
+		update_numeric_field("eg-pawn-strength", (w_eg - b_eg));
 	} else if (event.data.includes("Knights")) {
-		let type1 = parse_type1_eval(event.data, "Knight");
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Knight");
+		update_numeric_field("mg-knight-strength", (w_mg - b_mg));
+		update_numeric_field("eg-knight-strength", (w_eg - b_eg));
 	} else if (event.data.includes("Bishops")) {
-		let type1 = parse_type1_eval(event.data, "Bishop")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Bishop");
+		update_numeric_field("mg-bishop-strength", (w_mg - b_mg));
+		update_numeric_field("eg-bishop-strength", (w_eg - b_eg));
 	} else if (event.data.includes("Rooks")) {
-		let type1 = parse_type1_eval(event.data, "Rook")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Rook")
+		update_numeric_field("mg-rook-strength", (w_mg - b_mg));
+		update_numeric_field("eg-rook-strength", (w_eg - b_eg));
 	} else if (event.data.includes("Queens")) {
-		let type1 = parse_type1_eval(event.data, "Queen")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Queen")
+		update_numeric_field("mg-queen-strength", (w_mg - b_mg));
+		update_numeric_field("eg-queen-strength", (w_eg - b_eg));
 	} else if (event.data.includes("Mobility")) {
-		let type1 = parse_type1_eval(event.data, "Mobility")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Mobility")
+		update_numeric_field("mg-mobility", (w_mg - b_mg));
+		update_numeric_field("eg-mobility", (w_eg - b_eg));
 	} else if (event.data.includes("King safety")) {
-		let type1 = parse_type1_eval(event.data, "King safety")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "King safety")
+		update_numeric_field("mg-king-safety", (w_mg - b_mg));
+		update_numeric_field("eg-king-safety", (w_eg - b_eg));
 	} else if (event.data.includes("Threats")) {
-		let type1 = parse_type1_eval(event.data, "Threat")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Threat")
+		update_numeric_field("mg-threat", (w_mg - b_mg));
+		update_numeric_field("eg-threat", (w_eg - b_eg));
 	} else if (event.data.includes("Passed")) {
-		let type1 = parse_type1_eval(event.data, "Passed")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Passed")
+		update_numeric_field("mg-passed", (w_mg - b_mg));
+		update_numeric_field("eg-passed", (w_eg - b_eg));
 	} else if (event.data.includes("Space")) {
-		let type1 = parse_type1_eval(event.data, "Space")
+		let [w_mg, w_eg, b_mg, b_eg] = parse_type1_eval(event.data, "Space")
+		update_numeric_field("mg-space", (w_mg - b_mg));
+		update_numeric_field("eg-space", (w_eg - b_eg));
 	}
 }
 
@@ -525,7 +620,19 @@ function onDrop(source, target) {
 	removeHighlightSquares()
 
 	// Set last player move
-	last_player_move = { "FROM": source, "TO": target, "FROM_PIECE": piece_from(source), "TO_PIECE": piece_from(target), "PROMOTION": promotion };
+	let castling = null;
+	if (piece_from(source)["type"].toLowerCase() == "k") {
+		if (target === "g1") {
+			castling = "O-O";
+			console.log("[*] Castling: O-O");
+		} else if (target === "c1") {
+			castling = "O-O-O";
+			console.log("[*] Castling: O-O-O");
+		}
+	}
+
+	// Set last move
+	last_player_move = { "FROM": source, "TO": target, "FROM_PIECE": piece_from(source), "TO_PIECE": piece_from(target), "PROMOTION": promotion, "CASTLING": castling};
 
 	// see if the move is legal
 	let move = game.move({
