@@ -832,9 +832,10 @@ var config = {
 // Start the game by creating the board
 board = Chessboard('chessboard', config)
 
+// TODO: Rerformat the horrible code {FEB 12} (Will probably fix every bug)
 // ! BUG: Only the pawn type 1 evaluation gets updated for some reason at some cases at some times {FEB 12}
+// ! BUG: Fix turn back time to the gool old days after a win {FEB 12}
 // TODO: Save and load games (Use clipboard) {FEB 12}
-// TODO: Rerformat the horrible code {FEB 12}
 // TODO: Fix en passant turn back time to the good old days {FEB 12}
 // TODO: Balance AI difficulty {FEB 13}
 // TODO: Give player hints based on the full evaluation of the board {FEB 13}
