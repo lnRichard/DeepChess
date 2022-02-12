@@ -28,12 +28,12 @@
 <body>
    <main>
       <h2>History</h2>
-      <div id="history_container">
+      <div id="history-container">
          <div id="history"></div>
       </div>
       <!-- <h1 class="process">v.s. {enemy}</h1> -->
       <div class="left sub-container">
-         <h2>MID-GAME</h2>
+         <h2 title="Current board state">CURRENT</h2>
          <br>
          <h3>Pieces</h3>
          <hr>
@@ -72,7 +72,7 @@
          </div>
       </div>
       <div class="right sub-container">
-         <h2>END-GAME</h2>
+         <h2 title="Predicted board state (in 15 turns)">FUTURE</h2>
          <br>
          <h3>Pieces</h3>
          <hr>
@@ -124,12 +124,15 @@
             <option value="b">Bishop</option>
          </select>
          <span class="highlight">Evaluation: </span>
-         <span id="evaluation" class="neutral">0</span> {<span id="elo_mod" class="neutral">+0</span>}
+         <span id="evaluation" class="neutral">0</span> {<span id="elo-mod" class="neutral">+0</span>}
       </div>
       <span id="bottom-note">
          <h3 class='highlight'>Your turn</h3>
       </span>
       <span id="buttons"><button id="back-button">Return</button><button id="hint-button">Hint</button></span>
+      <div>
+         <div id="type-2-eval"></div>
+      </div>
    </main>
    <!-- You can also require other files to run in this process -->
    <script src="../js/play.js"></script>

@@ -347,3 +347,22 @@ li::before {
 	right: 1vw;
 	top: 7vw;
 }
+
+.info-label {
+	font-size: var(--space-sm);
+	color: rgba(255, 255, 255, 0.2);
+}
+
+#type-2-eval {
+	border-radius: var(--space-sm);
+	border: 1px solid var(--surface4);
+	background: var(--surface2);
+	padding: var(--space-xxs);
+	margin: var(--space-xxs);
+	display: flex;
+	box-shadow: 0px 0px 5px 2px var(--box-shadow1);
+	width: 5vw;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+}
