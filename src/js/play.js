@@ -713,8 +713,6 @@ function onDrop(source, target) {
 		"EVAL_BOARD": type_2_eval_board,
 	};
 
-	reset_type_2_eval_board();
-
 	// see if the move is legal
 	let move = game.move({
 		from: source,
@@ -724,6 +722,7 @@ function onDrop(source, target) {
 
 	// illegal move
 	if (move === null) return 'snapback'
+	reset_type_2_eval_board();
 
 	// Check if the first move was made
 	if (firstMove) {
