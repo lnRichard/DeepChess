@@ -833,26 +833,27 @@ var config = {
 board = Chessboard('chessboard', config)
 
 // ! BUG: Only the pawn type 1 evaluation gets updated for some reason at some cases at some times
-// TODO: Fix rookering en en passant turn back time to the good old days
+// TODO: Fix rookering and become good [x]
+// TODO: Fix en passant turn back time to the good old days
 // TODO: Add move time mechanic
 // TODO: Balance AI difficulty
 // TODO: Add full evaluation of board [x]
 // TODO: Give player hints based on the full evaluation of the board
-// TODO: Show text hints on the screen, next to the board
+// TODO: Show text hints on the screen, next to the board [x]
 // TODO: Timer for the game and AI
 // TODO: Save and load games (Use clipboard)
 // TODO: Turning back turns [x]
 // TODO: Defining starting positions/puzzles
 // TODO: Custom AI difficulty, outside of it automatically adjusting
 // TODO: Add bar on top of page, where you can go back to previous turns [x]
-// *TODO: Allow branching in bar, by keeping different turn tracks
+// TODO: Allow branching in bar, by keeping different turn tracks
 // TODO: Ability to get list of best moves instead of only the best move
 // TODO: Add opening display, where you can try different openings
 // TODO: Protect app from security vulnerabilities
-// *TODO: Show arrows based on pawn moves on the board
+// TODO: Show arrows based on pawn moves on the board
 // TODO: Show what pieces are attacking each other for the current position
 // TODO: Visualize current game rating as a progress bar (White v.s. Black)
 // TODO: Try to rationalize the AI, by showing the next few move the hint would make as well
 // TODO: Show moves towards check by M1, M2, etc.
-// *TODO: Find move variations, and show them on the board
-// TODO: Type 2 evaluation system
+// TODO: Find move variations, and show them on the board
+// TODO: Type 2 evaluation system [x]
