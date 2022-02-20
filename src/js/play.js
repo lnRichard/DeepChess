@@ -54,33 +54,20 @@ const blackRedSquareHighlightHint = '#7f5353';
 const stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 const stockfishMoveDelay = 1000; // ms
 const stockfishGenerationDelay = 500; // ms
-const evaluationHistory = [];
 var isStockfishPlaying = false;
 
 // Board evaluation
-const boardEval = defaultBoardEval();
+var boardEval = defaultBoardEval();
 var isBoardEval = false;
 var isBoardEvalSkipLine = true;
 var boardEvalLineCount = 8;
 
 // Chess turn history
-const chessTurnHistory = [];
+var chessTurnHistory = [];
 var chessTurn = 0;
-updateChessTurnHistory();
 
 // Piece evaluation
-const pieceEval = {
-   "Pawns": 0,
-   "Knights": 0,
-   "Bishops": 0,
-   "Rooks": 0,
-   "Queens": 0,
-   "Mobility": 0,
-   "King safety": 0,
-   "Threats": 0,
-   "Passed": 0,
-   "Space": 0,
-}
+var pieceEval = defaultPieceEval();
 
 
 // UTILITY FUNCTIONS
@@ -183,21 +170,21 @@ function addElo(amount) {
 
 function getEloChange(evaluation) {
    // Check if history is valid
-   const historyLength = evaluationHistory.length;
-   if (historyLength <= 0) return evaluation;
+   const historyLength = chessTurnHistory.length - 1;
+   if (historyLength <= 0) return evaluation, 0;
 
    // Calculate elo change
    let eloChange = 0;
    if (Number.isNaN(evaluation)) {
       // Evaluation is invalid
-      evaluation = evaluationHistory[historyLength - 1];
+      evaluation = chessTurnHistory[historyLength - 1]["eval"]["eval"];
    } else {
       // Evaluation is valid
-      eloChange = (evaluation - evaluationHistory[historyLength - 1]);
+      eloChange = (evaluation - chessTurnHistory[historyLength - 1]["eval"]["eval"]);
    }
 
    // Return evaluation and elo change
-   return evaluation, eloChange;
+   return {"evaluation": evaluation, "eloChange": eloChange};
 }
 
 
@@ -215,6 +202,21 @@ function defaultBoardEval() {
       "g1": 0, "g2": 0, "g3": 0, "g4": 0, "g5": 0, "g6": 0, "g7": 0, "g8": 0,
       "h1": 0, "h2": 0, "h3": 0, "h4": 0, "h5": 0, "h6": 0, "h7": 0, "h8": 0,
    };
+}
+
+function defaultPieceEval() {
+   return {
+      "Pawns": 0,
+      "Knights": 0,
+      "Bishops": 0,
+      "Rooks": 0,
+      "Queens": 0,
+      "Mobility": 0,
+      "King safety": 0,
+      "Threats": 0,
+      "Passed": 0,
+      "Space": 0,
+   }
 }
 
 function handleMoveEnd() {
@@ -237,16 +239,48 @@ function updateChessTurnHistory() {
    };
 }
 
+function startFirstChessTurn() {
+   updateChessTurnHistory();
+   chessTurnHistory[chessTurn]["white_move"] = undefined;
+   chessTurnHistory[chessTurn]["black_move"] = undefined;
+   chessTurnHistory[chessTurn]["eval"] = { "eval": 0, "elo_change": 0 };
+   chessTurnHistory[chessTurn]["board_eval"] = boardEval;
+   chessTurnHistory[chessTurn]["piece_eval"] = pieceEval;
+   startNextChessTurn();
+}
+
 function startNextChessTurn() {
-   // Set fen of last turn if valid
+   // Set fen of turn
+   chessTurnHistory[chessTurn]["fen"] = game.fen();
+   log("[!] Last chess turn:", chessTurnHistory[chessTurn]);
 
    // Update new chess turn
    chessTurn += 1;
    updateChessTurnHistory();
+}
 
-   // Log chess turn
-   chessTurnHistory[chessTurn - 1]["fen"] = game.fen();
-   log("[!] Last chess turn:", chessTurnHistory[chessTurn - 1]);
+function moveToTurn(turn) {
+   // Check if turn is valid
+   if (chessTurnHistory.length === 0 || turn < 0 || turn >= chessTurnHistory.length - 2 || isStockfishActive()) return;
+
+   // Update chess turn
+   chessTurn = turn;
+   game.load(chessTurnHistory[chessTurn]["fen"]);
+   boardEval = chessTurnHistory[chessTurn]["board_eval"];
+   pieceEval = chessTurnHistory[chessTurn]["piece_eval"];
+
+   // Update fen
+   updateGameFen();
+
+   // Remove all dedundant chessTurnHistory
+   // TODO: Replace this with branching turn history
+   const targetTurn = chessTurnHistory[turn];
+   chessTurnHistory = turn - 1 >= 0 ? chessTurnHistory.slice(0, turn - 1) : [];
+
+   // Reset board state
+   chessTurnHistory[turn] = targetTurn;
+   startNextChessTurn();
+   log("[!] Moved to turn:", turn, chessTurnHistory);
 }
 
 function swapActivePlayer() {
@@ -406,8 +440,7 @@ function handleStockfishEvaluation(eventData) {
       // Fetch evaluation and elo change
       let eloChange = 0;
       let evaluation = Number.parseFloat(eventData.replaceAll("Final evaluation       ", "").replaceAll(" (white side)", ""));
-      evaluation, eloChange = getEloChange(evaluation);
-      evaluationHistory.push(evaluation);
+      ({evaluation, eloChange} = getEloChange(evaluation));
 
       // Generate evaluation
       log(`[*] Evaluation: ${evaluation} {white}`);
@@ -452,7 +485,7 @@ function handleStockfishBoardEvaluation(eventData) {
    if (boardEvalLineCount <= 0) {
       // Stop board evaluation
       isBoardEval = false;
-      console.log("[*] BOARD EVAL END:", boardEval);
+      log("[*] BOARD EVAL END:", boardEval);
 
       // Update chess turn history
       chessTurnHistory[chessTurn]["board_eval"] = boardEval;
@@ -494,6 +527,7 @@ function handleStockfishPieceEvaluation(eventData, key) {
 stockfish.postMessage("uci");
 stockfish.postMessage("setoption name Use NNUE value true");
 enableStockfishMoveMode();
+startFirstChessTurn();
 
 // Listen for stockfish messages
 stockfish.addEventListener("message",function (event) {
