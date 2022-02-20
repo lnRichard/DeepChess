@@ -3,22 +3,21 @@
 
 <head>
    <meta charset="UTF-8">
-   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
    <link href="../css/main.css" rel="stylesheet">
    <link rel="stylesheet" href="../css/chessboard-1.0.0.min.css">
-   <script src="../js/chessboard-1.0.0.min.js"></script>
-   <script src="../js/_style.js"></script>
+   <script src="../js/modules/chessboard-1.0.0.min.js"></script>
+   <script src="../js/includes/_style.js"></script>
    <title>DeepChess</title>
    <style>
       #chessboard {
          width: 500px;
       }
-
+   
       div {
          margin: auto;
       }
-
+   
       .container {
          margin: auto;
       }
@@ -27,89 +26,6 @@
 
 <body>
    <main>
-      <h2>History</h2>
-      <div id="history-container">
-         <div id="history"></div>
-      </div>
-      <!-- <h1 class="process">v.s. {enemy}</h1> -->
-      <div class="left sub-container">
-         <h2 title="Current board state">CURRENT</h2>
-         <br>
-         <h3>Pieces</h3>
-         <hr>
-         <div id="mg-pawn-strength-container">
-            Pawn strength: <span id="mg-pawn-strength" class="neutral">0</span>
-         </div>
-         <div id="mg-knight-strength-container">
-            Knight strength: <span id="mg-knight-strength" class="neutral">0</span>
-         </div>
-         <div id="mg-bishop-strength-container">
-            Bishop strength: <span id="mg-bishop-strength" class="neutral">0</span>
-         </div>
-         <div id="mg-rook-strength-container">
-            Rook strength: <span id="mg-rook-strength" class="neutral">0</span>
-         </div>
-         <div id="mg-queen-strength-container">
-            Queen strength: <span id="mg-queen-strength" class="neutral">0</span>
-         </div>
-         <div id="mg-king-safety-container">
-            King safety: <span id="mg-king-safety" class="neutral">0</span>
-         </div>
-         <br>
-         <h3>Board</h3>
-         <hr>
-         <div id="mg-mobility-container">
-            Piece mobility: <span id="mg-mobility" class="neutral">0</span>
-         </div>
-         <div id="mg-threat-container">
-            Piece threat: <span id="mg-threat" class="neutral">0</span>
-         </div>
-         <div id="mg-space-container">
-            Piece space: <span id="mg-space" class="neutral">0</span>
-         </div>
-         <div id="mg-passed-container">
-            Passed pawns: <span id="mg-passed" class="neutral">0</span>
-         </div>
-      </div>
-      <div class="right sub-container">
-         <h2 title="Predicted board state (in 15 turns)">FUTURE</h2>
-         <br>
-         <h3>Pieces</h3>
-         <hr>
-         <div id="eg-pawn-strength-container">
-            Pawn strength: <span id="eg-pawn-strength" class="neutral">0</span>
-         </div>
-         <div id="eg-knight-strength-container">
-            Knight strength: <span id="eg-knight-strength" class="neutral">0</span>
-         </div>
-         <div id="eg-bishop-strength-container">
-            Bishop strength: <span id="eg-bishop-strength" class="neutral">0</span>
-         </div>
-         <div id="eg-rook-strength-container">
-            Rook strength: <span id="eg-rook-strength" class="neutral">0</span>
-         </div>
-         <div id="eg-queen-strength-container">
-            Queen strength: <span id="eg-queen-strength" class="neutral">0</span>
-         </div>
-         <div id="eg-king-safety-container">
-            King safety: <span id="eg-king-safety" class="neutral">0</span>
-         </div>
-         <br>
-         <h3>Board</h3>
-         <hr>
-         <div id="eg-mobility-container">
-            Piece mobility: <span id="eg-mobility" class="neutral">0</span>
-         </div>
-         <div id="eg-threat-container">
-            Piece threat: <span id="eg-threat" class="neutral">0</span>
-         </div>
-         <div id="eg-space-container">
-            Piece space: <span id="eg-space" class="neutral">0</span>
-         </div>
-         <div id="eg-passed-container">
-            Passed pawns: <span id="eg-passed" class="neutral">0</span>
-         </div>
-      </div>
       <div>
          <div class="container">
             <div id="chessboard"></div>
@@ -123,18 +39,45 @@
             <option value="r">Rook</option>
             <option value="b">Bishop</option>
          </select>
-         <span class="highlight">Evaluation: </span>
-         <span id="evaluation" class="neutral">0</span> {<span id="elo-mod" class="neutral">+0</span>}
       </div>
-      <span id="bottom-note">
-         <h3 class='highlight'>Your turn</h3>
-      </span>
-      <span id="buttons"><button id="back-button">Return</button><button id="hint-button">Hint</button></span>
-      <div>
-         <div id="type-2-eval"></div>
-      </div>
+      <span id="buttons"><button id="back-button">Return</button>
+      <!-- TODO:
+         1. Add chessboard to the middle of the screen.
+         2. Add game controls below the chessboard.
+         3. Add move history to the right of the chessboard, allow moving back and forth.
+         4. Allow multiple timelines, and allow turning a sub-timeline into a main timeline (lichess.com)
+         5. Add type 1 analysis tools to the left of the chessboard.
+         6. Add type 2 anylisis tools below the chessboard.
+         7. Add button to toggle between tool complexity (beginner, advanced, and grandmaster).
+         8. Add popup when promoting a pawn.
+         9. Show when a player is close to being in check.
+         10. Show when a timeline terminates in a win or loss.
+         11. Show how good/bad the turn was for the player by coloring the moves with gradients.
+         12. Add timer above the board to show the game time, store times per turn.
+         13. Show a game elo rating, and summary uptill now.
+         14. Allow saving and loading of games, and downloading game summaries formatted using ASCII art.
+         15. Allow toggling analysis tool for a hint box, or chat where the AI gives you hints.
+         16. Hint system where you can highlight the best or x best moves.
+         17. Allow viewing of a all stockfishes parameters at the current difficulty.
+         18. Save game history to the file system, and allow loading of games (Custom save format).
+         19. Allow sharing games via social media, create a cool embed code.
+         20. Add blind mode where blind people can play against the AI using audio.
+         21. Add a mini-encyclopedia of rules, chesspieces, and openings.
+         22. Make the AI dynamically give hints and explain moves based on the player's elo rating.
+         23. Show icon when the AI sends the player a message, so they know even if they are analysing.
+         24. Allow the player to customize the depth/settings of stockfish in its analysis mode.
+         25. Display which pieces have already been taken in the turn history.
+         26. Add visual evaluation by modifying the colors of the chessboard.
+         27. Show both time and who is winning through a progress bar at the bottom of the screen.
+         28. Allow for highlighting pieces that are under attack, and which ones they are attacking.
+         29. Allow playing in sandbox mode, where you can manually define the engine and parameters to play.
+         30. Add keyboard only support for the app, and custom shortcuts to perform certain actions.
+         - EX: Add funny responses to AI chatbox, for special occasions.
+         - EX: Add puzzle mode where you predict the outcome of moves.
+         - EX: Add puzzle mode where you have to hit a rating of x in x moves for a random position.
+      -->
    </main>
-   <!-- You can also require other files to run in this process -->
+   <!-- Scripts -->
    <script src="../js/play.js"></script>
 </body>
 

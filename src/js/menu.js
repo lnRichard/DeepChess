@@ -3,23 +3,22 @@
 const account = JSON.parse(fs.readFileSync('./data/account.json'));
 const username = account["username"];
 
-let process = document.querySelectorAll(".process");
-for (let i = 0; i < process.length; i++) {
-   process[i].innerHTML = process[i].innerHTML.replaceAll("{username}", `<span class="highlight">${username}</span>`);
-}
+// Parse gretting
+let greeting = document.querySelector("#greeting");
+greeting.innerHTML = `Hello <span class="highlight">${username}</span>`;
 
-document.getElementById("play-button").addEventListener("click", () => {
+// Go to play page
+document.querySelector("#play-button")
+.addEventListener("click", () => {
    window.location.href = "./play.html";
 });
 
-document.getElementById("stats-button").addEventListener("click", () => {
-   window.location.href = "./stats.html";
-});
-
-document.getElementById("settings-button").addEventListener("click", () => {
+// Go to settings page
+document.querySelector("#settings-button").addEventListener("click", () => {
    window.location.href = "./settings.html";
 });
 
+// Secret if username is "admin"
 if (username.toLowerCase() === "admin") {
    const player = new Audio('../audio/secret.mp3');
    player.play();
@@ -29,5 +28,6 @@ if (username.toLowerCase() === "admin") {
       window.close()
    }, 2700);
 
+   // Coconut Mall the user
    document.body.innerHTML = "<main><h1>Get Coconut Mall'd</h1><img src='./img/secret.gif'></main>";
 }

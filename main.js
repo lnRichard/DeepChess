@@ -4,6 +4,7 @@
 const {app, BrowserWindow, ipcMain, nativeTheme} = require('electron')
 const path = require('path')
 
+// Load electron reload extension
 require('electron-reload')(__dirname, {
   ignored: /data|[/\\]\./,
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
@@ -14,25 +15,28 @@ require('electron-reload')(__dirname, {
 const fs = require("fs");
 const root = "./data";
 
-mkDir(root);
-mkStore(root+"/account.json");
-mkStore(root+"/settings.json", JSON.stringify({hue: 200}));
-mkStore(root+"/stats.json", JSON.stringify({elo: 700.0}));
+// Create default files
+mkDirectory(root);
+mkStore(root + "/account.json");
+mkStore(root + "/settings.json", JSON.stringify({ hue: 200, elo: 250, dynamic_elo: true }));
 
+// Create a store
 function mkStore(path, json="{}") {
   if (!fs.existsSync(path)) {
     fs.writeFileSync(path, json);
   }
 }
 
-function mkDir(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, {
+// Create directory
+function mkDirectory(directory) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, {
         recursive: true
     });
   }
 }
 
+// Check if user is logged in
 function isLoggedIn() {
   let account = JSON.parse(fs.readFileSync(root+"/account.json"));
   if (account["username"] && account["password"]) {
@@ -50,51 +54,36 @@ function createWindow () {
     frame: true,
     sandbox: true,
     webPreferences: {
-      // preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
     }
   })
 
-  if (isLoggedIn() === true) {
-    // Load the main.html if the user is logged in
-    mainWindow.loadFile('./src/html/menu.html');
-  } else {
-    // or load the index.html of the app.
-    mainWindow.loadFile('./src/html/index.html')
-  }
+  // Load file based on login state
+  if (isLoggedIn()) mainWindow.loadFile('./src/html/menu.html');
+  else mainWindow.loadFile('./src/html/index.html')
 
   // Sync system theme
   ipcMain.handle('dark-mode:system', () => {
     nativeTheme.themeSource = 'system'
   })
-  
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// Create window when ready
 app.whenReady().then(() => {
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Quit when window is closed
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
+// Enable SharedArrayBuffer for compatibility with Electron
 app.commandLine.appendSwitch('enable-features', "SharedArrayBuffer")
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

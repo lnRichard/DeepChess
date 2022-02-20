@@ -3,10 +3,9 @@
 
 <head>
 	<meta charset="UTF-8">
-	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
 	<meta http-equiv="Content-Security-Policy" content="script-src 'self'">
 	<link href="../css/main.css" rel="stylesheet">
-	<script src="../js/_style.js"></script>
+	<script src="../js/includes/_style.js"></script>
 	<title>DeepChess</title>
 </head>
 
@@ -14,15 +13,14 @@
 	<main>
 		<h1>DeepChess</h1>
 		<div>
-			<h2 class="process">Hello {{username}}</h2>
+			<h2 id="greeting">Hello {{username}}</h2>
 			<div class="options">
 				<button id="play-button">New Game</button>
-				<button id="stats-button">Stats</button>
 				<button id="settings-button">Settings</button>
 			</div>
 		</div>
 	</main>
-	<!-- You can also require other files to run in this process -->
+	<!-- Scripts -->
 	<script src="../js/menu.js"></script>
 </body>
 

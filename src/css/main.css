@@ -120,7 +120,6 @@ main {
 	background: var(--surface1);
 	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
 	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
-
 }
 
 form {
