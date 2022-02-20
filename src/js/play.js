@@ -14,6 +14,7 @@ const Chess = require('chess.js').Chess;
 // Game Config
 const logging = true;
 const settingsFilePath = "./data/settings.json";
+const errorPrefix = "[!] An error occurred:";
 const game = new Chess();
 const chessboard = {
    // Chessboard.js
@@ -55,6 +56,7 @@ const stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
 const stockfishMoveDelay = 1000; // ms
 const stockfishGenerationDelay = 500; // ms
 var isStockfishPlaying = false;
+var isStockfishHinting = false;
 
 // Board evaluation
 var boardEval = defaultBoardEval();
@@ -257,11 +259,12 @@ function startNextChessTurn() {
    // Update new chess turn
    chessTurn += 1;
    updateChessTurnHistory();
+   updateGameFen();
 }
 
 function moveToTurn(turn) {
    // Check if turn is valid
-   if (chessTurnHistory.length === 0 || turn < 0 || turn >= chessTurnHistory.length - 2 || isStockfishActive()) return;
+   if (chessTurnHistory.length === 0 || turn < 0 || turn >= chessTurnHistory.length - 1 || isStockfishActive()) return;
 
    // Update chess turn
    chessTurn = turn;
@@ -291,6 +294,14 @@ function swapActivePlayer() {
    game.load(tokens.join(" "));
 }
 
+function setActivePlayer(color) {
+   // Parse fen data and swap active player
+   const tokens = game.fen().split(" ");
+   tokens[1] = color;
+   tokens[3] = "-";
+   game.load(tokens.join(" "));
+}
+
 function removeSquareHighlights() {
    $('#chessboard .square-55d63').css('background', '');
 }
@@ -305,6 +316,22 @@ function highlightSquare(square) {
    // Check if the square is an opponent's piece
    if (game.get(square) && game.get(square).color === 'b') {
       background = background === whiteSquareHighlight ? whiteRedSquareHighlight : blackRedSquareHighlight;
+   }
+
+   // Update the square's background
+   $square.css('background', background)
+}
+
+function hightlightSquareHint(square) {
+   // Fetch the square element
+   const $square = $("#chessboard .square-" + square);
+
+   // Fetch the background
+   let background = $square.hasClass('black-3c85d') ? blackRedSquareHighlightHint : whiteRedSquareHighlightHint;
+
+   // Check if the square is an opponent's piece
+   if (game.get(square) && game.get(square).color === 'b') {
+      background = background === whiteRedSquareHighlightHint ? whiteRedSquareHighlightHint : blackRedSquareHighlightHint;
    }
 
    // Update the square's background
@@ -429,7 +456,7 @@ function handleStockfishMove(eventData) {
          stockfish.postMessage("eval depth 15");
       } catch (error) {
          // Retry stockfish move
-         log("[!] An error occurred:", error);
+         log(errorPrefix, error);
          stockfish.postMessage("go depth " + getDepth());
       }
    }, stockfishGenerationDelay);
@@ -458,7 +485,7 @@ function handleStockfishEvaluation(eventData) {
       setTimeout(() => {
          stockfish.postMessage("eval depth 15");
       }, 500);
-      log("[!] An error occurred:", error);
+      log(errorPrefix, error);
    }
 }
 
@@ -520,6 +547,42 @@ function handleStockfishPieceEvaluation(eventData, key) {
    chessTurnHistory[chessTurn]["piece_eval"][key] = {"mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black};
 }
 
+function handleStockfishHint(eventData) {
+   // Update stockfish status
+   try {
+      // Check for game over
+      const possibleMoves = game.moves()
+      if (possibleMoves.length === 0) return
+
+      // Fetch move and type of the piece
+      const move = eventData.split(" ")[1];
+      const from = move.slice(0, 2);
+      const to = move.slice(2, 4);
+
+      // Highlight the move
+      hightlightSquareHint(from)
+      hightlightSquareHint(to)
+      console.log("[!] AI HINT: " + from + " -> " + to);
+
+      // Update state
+      isStockfishHinting = false;
+      isStockfishPlaying = false;
+   } catch (error) {
+      // Retry stockfish move
+      log(errorPrefix, error);
+      stockfish.postMessage("go depth 10");
+   }
+}
+
+function generateHint() {
+   // Update state
+   isStockfishHinting = true;
+   isStockfishPlaying = true;
+
+   // Generate hint
+   stockfish.postMessage("go depth 10");
+}
+
 
 // STOCKFISH LOGIC
 
@@ -529,29 +592,64 @@ stockfish.postMessage("setoption name Use NNUE value true");
 enableStockfishMoveMode();
 startFirstChessTurn();
 
+function stockfishErrorFallback() {
+   // Reset turn to default state
+   isStockfishHinting = false;
+   isStockfishPlaying = false;
+   setActivePlayer("w");
+   moveToTurn(chessTurn - 1);
+   removeSquareHighlights();
+}
+
+var _DEBUG_THROW_ERROR = false; // TODO: Remove
 // Listen for stockfish messages
 stockfish.addEventListener("message",function (event) {
-   if (event.data.includes("bestmove")) {
-      // Stockfish returned a move
-      handleStockfishMove(event.data);
-   } else if (event.data.includes("Final evaluation")) {
-      // Stockfish returned an evaluation
-      handleStockfishEvaluation(event.data);
-      startNextChessTurn();
-   } else if (event.data.includes("NNUE derived piece values")) {
-      // Start the board evaluation
-      isBoardEval = true;
-      isBoardEvalSkipLine = true;
-      boardEvalLineCount = 8;
-   } else if (isBoardEval && event.data.includes("|")) {
-      handleStockfishBoardEvaluation(event.data);
-   } else {
-      // Fetch piece evaluation
-      for (const key of Object.keys(pieceEval)) {
-         if (event.data.includes(key)) {
-            // Calculate piece evaluation
-            handleStockfishPieceEvaluation(event.data, key);
+   try {
+      if (isStockfishHinting || !isStockfishPlaying) return;
+      if (_DEBUG_THROW_ERROR) throw new Error("[!] DEBUG: Stockfish error");
+
+      // Check for stockfish move
+      if (event.data.includes("bestmove")) {
+         // Stockfish returned a move
+         handleStockfishMove(event.data);
+      } else if (event.data.includes("Final evaluation")) {
+         // Stockfish returned an evaluation
+         handleStockfishEvaluation(event.data);
+         startNextChessTurn();
+      } else if (event.data.includes("NNUE derived piece values")) {
+         // Start the board evaluation
+         isBoardEval = true;
+         isBoardEvalSkipLine = true;
+         boardEvalLineCount = 8;
+      } else if (isBoardEval && event.data.includes("|")) {
+         handleStockfishBoardEvaluation(event.data);
+      } else {
+         // Fetch piece evaluation
+         for (const key of Object.keys(pieceEval)) {
+            if (event.data.includes(key)) {
+               // Calculate piece evaluation
+               handleStockfishPieceEvaluation(event.data, key);
+            }
          }
       }
+   } catch(error) {
+      log(errorPrefix, error);
+      stockfishErrorFallback();
+   }
+});
+
+// Listen for stockfish messages
+stockfish.addEventListener("message", function (event) {
+   try {
+      if (!isStockfishHinting || !isStockfishPlaying) return;
+
+      // Check for stockfish move
+      if (event.data.includes("bestmove")) {
+         // Stockfish returned a move
+         handleStockfishHint(event.data);
+      }
+   } catch(error) {
+      log(errorPrefix, error);
+      stockfishErrorFallback();
    }
 });
