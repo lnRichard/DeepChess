@@ -4,14 +4,15 @@
 const hue = document.querySelector("#hue");
 const elo = document.querySelector("#elo");
 const dynamic_elo = document.querySelector("#dynamic-elo");
-const options = JSON.parse(fs.readFileSync("./data/settings.json"));
+const settings_path = "./data/settings.json";
+const options = JSON.parse(fs.readFileSync(settings_path));
 
 // Save options on back button click
 document.querySelector("#back-button")
-.addEventListener("click", () => {
-   fs.writeFileSync("./data/settings.json", JSON.stringify(options));
-   window.location.href = "./menu.html";
-});
+   .addEventListener("click", () => {
+      fs.writeFileSync(settings_path, JSON.stringify(options));
+      window.location.href = "./menu.html";
+   });
 
 // Update the settings
 hue.value = options["hue"];
@@ -34,7 +35,7 @@ function saveNumeric(field, type, min, max) {
    // Update setting
    field.value = value;
    options[type] = value;
-   fs.writeFileSync("./data/settings.json", JSON.stringify(options));
+   fs.writeFileSync(settings_path, JSON.stringify(options));
    return value;
 }
 
@@ -46,7 +47,7 @@ function saveBoolean(field, type) {
    // Update setting
    field.value = value;
    options[type] = value;
-   fs.writeFileSync("./data/settings.json", JSON.stringify(options));
+   fs.writeFileSync(settings_path, JSON.stringify(options));
 }
 
 // Change application hue on settings change
@@ -72,14 +73,14 @@ document.querySelector("#hue-label").addEventListener("click", () => {
    hue.value = value;
    options["hue"] = value;
    root.style.setProperty("--hue", value);
-   fs.writeFileSync("./data/settings.json", JSON.stringify(options));
+   fs.writeFileSync(settings_path, JSON.stringify(options));
 });
 
 // Secret when the user is named "Chroma", "Rainbow", or "Colors"
 if (["chroma", "rainbow", "colors"]
-.includes(
-JSON.parse(fs.readFileSync('./data/account.json'))["username"].toLowerCase()
-)) {
+   .includes(
+      JSON.parse(fs.readFileSync('./data/account.json'))["username"].toLowerCase()
+   )) {
    // Update hue every x miliseconds
    var up = true;
    setInterval(() => {

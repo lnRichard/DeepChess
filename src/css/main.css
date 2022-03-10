@@ -112,6 +112,13 @@ main {
 	gap: var(--space-xs);
 }
 
+.playing-area {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
 .container {
 	padding: var(--space-xl);
 	padding-block-end: var(--space-xxl);
@@ -120,6 +127,55 @@ main {
 	background: var(--surface1);
 	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
 	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
+}
+
+#container-left {
+	min-height: 39em;
+	max-height: 39em;
+	padding: var(--space-md);
+	padding-block-end: 0;
+	overflow: auto;
+	min-width: 15em;
+}
+
+#container-right {
+	min-height: 39em;
+	max-height: 39em;
+	padding: var(--space-md);
+	padding-block-end: 0;
+	overflow: auto;
+	min-width: 15em;
+}
+
+.chess-turn {
+	display: block;
+	padding: var(--space-sm);
+	border-radius: var(--space-sm);
+	border: 1px solid var(--surface4);
+	background: var(--surface5);
+	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
+	font-size: 12px;
+	cursor: pointer;
+	margin-bottom: 5px;
+	max-width: 25em;
+}
+
+.chess-turn-field {
+	padding-right: 10px;
+}
+
+.turn-number {
+	color: var(--text1);
+	font-weight: 600;
+}
+
+.white-move-label {
+	color: var(--text2);
+}
+
+.black-move-label {
+	color: var(--text2);
 }
 
 form {
@@ -320,7 +376,6 @@ li::before {
 	width: 25vw;
 	height: 40vw;
 	max-width: 40vw;
-	border-radius: 5px;
 	padding: var(--space-xl);
 	padding-block-end: var(--space-xxl);
 	border-radius: var(--space-sm);

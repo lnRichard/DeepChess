@@ -13,22 +13,31 @@
       #chessboard {
          width: 500px;
       }
-   
+
       div {
          margin: auto;
       }
-   
+
       .container {
          margin: auto;
       }
+
    </style>
 </head>
 
 <body>
    <main>
-      <div>
-         <div class="container">
+      <div class="playing-area">
+         <div class="container" id="container-left">
+            <div id="analysis"></div>
+         </div>
+
+         <div class=" container">
             <div id="chessboard"></div>
+         </div>
+
+         <div class="container" id="container-right">
+            <div id="moves"></div>
          </div>
       </div>
       <div>
@@ -41,7 +50,7 @@
          </select>
       </div>
       <span id="buttons"><button id="back-button">Return</button>
-      <!-- TODO:
+         <!-- TODO:
          1. Add chessboard to the middle of the screen.
          2. Add game controls below the chessboard.
          3. Add move history to the right of the chessboard, allow moving back and forth.

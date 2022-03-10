@@ -22,5 +22,6 @@ module.exports = {
         "unicorn/prefer-at": "error",
         "unicorn/prefer-string-replace-all": "error",
         "unicorn/prefer-module": "off",
+        "unicorn/template-indent": "off",
     },
 };

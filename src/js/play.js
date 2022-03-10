@@ -76,7 +76,7 @@ var pieceEval = defaultPieceEval();
 
 function log() {
    // Log a console message if logging is enabled
-   if (!logging) return; 
+   if (!logging) return;
    console.log.apply(console, arguments);
 }
 
@@ -186,7 +186,7 @@ function getEloChange(evaluation) {
    }
 
    // Return evaluation and elo change
-   return {"evaluation": evaluation, "eloChange": eloChange};
+   return { "evaluation": evaluation, "eloChange": eloChange };
 }
 
 
@@ -251,10 +251,57 @@ function startFirstChessTurn() {
    startNextChessTurn();
 }
 
+function getLabel(value) {
+   if (value < 0) return "negative"
+   return (value == 0) ? "neutral" : "positive";
+}
+
+function buildChessTurnHTML(chessTurn) {
+   return /*html*/`
+      <div class='chess-turn' id='chess-turn-${chessTurn}'>
+         <span class='chess-turn-field turn-number'>
+            <span class='chess-turn-label turn-number-label'>TURN</span>: ${chessTurn}
+         </span><br>
+         <span class='chess-turn-field white-move'>
+            <span class='chess-turn-label white-move-label'>White</span>: ${chessTurnHistory[chessTurn]["white_move"]["from"] ?? "None"} ${chessTurnHistory[chessTurn]["black_move"]["to"] ?? "None"}
+         </span>
+         <span class='chess-turn-field black-move'>
+            | <span class='chess-turn-label black-move-label'>Black</span>: ${chessTurnHistory[chessTurn]["black_move"]["from"] ?? "None"} ${chessTurnHistory[chessTurn]["black_move"]["to"] ?? "None"}
+         </span><br>
+         <span class='chess-turn-field eval'>
+            <span class='chess-turn-label eval-label ${getLabel(chessTurnHistory[chessTurn]["eval"]["eval"])}'>Eval</span>: ${chessTurnHistory[chessTurn]["eval"]["eval"].toFixed(2)}
+         </span>
+         <span class='chess-turn-field elo-change'>
+            | <span class='chess-turn-label elo-change-label ${getLabel(chessTurnHistory[chessTurn]["eval"]["elo_change"])}'>Turn Eval</span>: ${chessTurnHistory[chessTurn]["eval"]["elo_change"].toFixed(2)}
+         </span>
+      </div>
+   `;
+}
+
+function updateChessTurnDisplay(currentTurn) {
+   // Update the chess turn display
+   if (currentTurn <= 0) return;
+   $("#moves").append(buildChessTurnHTML(currentTurn));
+
+   // Scroll down to new turn
+   $("#container-right").scrollTop($("#container-right")[0].scrollHeight);
+   $("#moves").scrollTop($("#moves")[0].scrollHeight);
+
+   // Add automatic revert move to div
+   $(`#chess-turn-${currentTurn}`).on("click", function () {
+      // Revert the move
+      console.log(chessTurn > currentTurn, !isStockfishActive())
+      if (!isStockfishActive()) {
+         moveToTurn(currentTurn - 1);
+      }
+   });
+}
+
 function startNextChessTurn() {
    // Set fen of turn
    chessTurnHistory[chessTurn]["fen"] = game.fen();
    log("[!] Last chess turn:", chessTurnHistory[chessTurn]);
+   updateChessTurnDisplay(chessTurn);
 
    // Update new chess turn
    chessTurn += 1;
@@ -275,10 +322,15 @@ function moveToTurn(turn) {
    // Update fen
    updateGameFen();
 
+   // Update Display
+   for (let index = chessTurnHistory.length; index > turn - 1; index--) {
+      $(`#chess-turn-${index}`).remove();
+   }
+
    // Remove all dedundant chessTurnHistory
    // TODO: Replace this with branching turn history
    const targetTurn = chessTurnHistory[turn];
-   chessTurnHistory = turn - 1 >= 0 ? chessTurnHistory.slice(0, turn - 1) : [];
+   chessTurnHistory = turn >= 0 ? chessTurnHistory.slice(0, turn) : [];
 
    // Reset board state
    chessTurnHistory[turn] = targetTurn;
@@ -364,7 +416,7 @@ function onDrop(source, target) {
    if (!handleMoveEnd()) return 'snapback';
 
    // Update move history
-   chessTurnHistory[chessTurn]["white_move"] = {from: source, to: target};
+   chessTurnHistory[chessTurn]["white_move"] = { from: source, to: target };
 
    // Remove square highlighting
    removeSquareHighlights();
@@ -440,7 +492,7 @@ function handleStockfishMove(eventData) {
          type = !convert ? game.get(move.slice(0, 2))["type"].toUpperCase() : convert.toUpperCase();
 
          // Update chess turn history
-         chessTurnHistory[chessTurn]["black_move"] = {from: from, to: to};
+         chessTurnHistory[chessTurn]["black_move"] = { from: from, to: to };
 
          // Make the move
          log("[!] AI MOVE: ", from, " -> ", to);
@@ -467,7 +519,7 @@ function handleStockfishEvaluation(eventData) {
       // Fetch evaluation and elo change
       let eloChange = 0;
       let evaluation = Number.parseFloat(eventData.replaceAll("Final evaluation       ", "").replaceAll(" (white side)", ""));
-      ({evaluation, eloChange} = getEloChange(evaluation));
+      ({ evaluation, eloChange } = getEloChange(evaluation));
 
       // Generate evaluation
       log(`[*] Evaluation: ${evaluation} {white}`);
@@ -475,7 +527,7 @@ function handleStockfishEvaluation(eventData) {
       addElo(eloChange);
 
       // Update chess turn history
-      chessTurnHistory[chessTurn]["eval"] = {"eval": evaluation, "elo_change": eloChange};
+      chessTurnHistory[chessTurn]["eval"] = { "eval": evaluation, "elo_change": eloChange };
 
       // Update stockfish
       enableStockfishMoveMode();
@@ -529,7 +581,7 @@ function parsePieceEval(eventData, white = true) {
 
    // Returns the split values
    return [
-      Number.parseFloat(splitEval.replaceAll("  ", " ").split(" ")[0].trim()), 
+      Number.parseFloat(splitEval.replaceAll("  ", " ").split(" ")[0].trim()),
       Number.parseFloat(splitEval.replaceAll("  ", " ").split(" ")[1].trim())
    ];
 }
@@ -540,11 +592,11 @@ function handleStockfishPieceEvaluation(eventData, key) {
    let [mg_black, eg_black] = parsePieceEval(eventData, false);
 
    // Update fields
-   log(`[*] PIECE EVAL ${key}:`, {"mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black});
-   pieceEval[key] = {"mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black};
+   log(`[*] PIECE EVAL ${key}:`, { "mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black });
+   pieceEval[key] = { "mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black };
 
    // Update chess turn history
-   chessTurnHistory[chessTurn]["piece_eval"][key] = {"mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black};
+   chessTurnHistory[chessTurn]["piece_eval"][key] = { "mg_white": mg_white, "eg_white": eg_white, "mg_black": mg_black, "eg_black": eg_black };
 }
 
 function handleStockfishHint(eventData) {
@@ -603,7 +655,7 @@ function stockfishErrorFallback() {
 
 var _DEBUG_THROW_ERROR = false; // TODO: Remove
 // Listen for stockfish messages
-stockfish.addEventListener("message",function (event) {
+stockfish.addEventListener("message", function (event) {
    try {
       if (isStockfishHinting || !isStockfishPlaying) return;
       if (_DEBUG_THROW_ERROR) throw new Error("[!] DEBUG: Stockfish error");
@@ -632,7 +684,7 @@ stockfish.addEventListener("message",function (event) {
             }
          }
       }
-   } catch(error) {
+   } catch (error) {
       log(errorPrefix, error);
       stockfishErrorFallback();
    }
@@ -648,7 +700,7 @@ stockfish.addEventListener("message", function (event) {
          // Stockfish returned a move
          handleStockfishHint(event.data);
       }
-   } catch(error) {
+   } catch (error) {
       log(errorPrefix, error);
       stockfishErrorFallback();
    }

@@ -9,9 +9,9 @@ greeting.innerHTML = `Hello <span class="highlight">${username}</span>`;
 
 // Go to play page
 document.querySelector("#play-button")
-.addEventListener("click", () => {
-   window.location.href = "./play.html";
-});
+   .addEventListener("click", () => {
+      window.location.href = "./play.html";
+   });
 
 // Go to settings page
 document.querySelector("#settings-button").addEventListener("click", () => {
