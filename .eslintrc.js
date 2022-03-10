@@ -23,5 +23,6 @@ module.exports = {
         "unicorn/prefer-string-replace-all": "error",
         "unicorn/prefer-module": "off",
         "unicorn/template-indent": "off",
+        "sonarjs/no-duplicate-string": "off",
     },
 };

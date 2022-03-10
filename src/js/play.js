@@ -26,11 +26,20 @@ const chessboard = {
    onMouseoverSquare: onMouseOverSquare,
    onSnapEnd: onSnapEnd
 };
-$("#back-button").on("click", () => {
+$("#back-button").on("click", function () {
    window.location.href = "./menu.html";
 });
 $("#promotion").on("change", function () {
    piecePromotion = this.value;
+});
+$("#hint-button").on("click", function () {
+   generateHint();
+});
+$("#gradient-button").on("click", function () {
+   toggleGradient();
+});
+$(".game-hint").on("click", function () {
+   $(".game-hint").remove();
 });
 
 // Chessboard Config
@@ -38,18 +47,19 @@ const board = Chessboard('chessboard', chessboard);
 
 // User Config
 var piecePromotion = 'q';
+var gradientDisplay = false;
 
 // Highlight Config
 const whiteSquareHighlight = '#a9a9a9';
 const blackSquareHighlight = '#696969';
-const whiteRedSquareHighlight = '#b59b9b';
-const blackRedSquareHighlight = '#785959';
+const whiteRedSquareHighlight = '#978fb0';
+const blackRedSquareHighlight = '#625978';
 
 // Hint highlight Config
-const whiteSquareHighlightHint = '#ffcccc';
-const blackSquareHighlightHint = '#cc9999';
-const whiteRedSquareHighlightHint = '#b08f8f';
-const blackRedSquareHighlightHint = '#7f5353';
+const whiteSquareHighlightHint = '#cce2ff';
+const blackSquareHighlightHint = '#99b0cc';
+const whiteRedSquareHighlightHint = '#978fb0';
+const blackRedSquareHighlightHint = '#625978';
 
 // Stockfish Config
 const stockfish = new Worker("../../node_modules/stockfish/src/stockfish.js");
@@ -70,6 +80,12 @@ var chessTurn = 0;
 
 // Piece evaluation
 var pieceEval = defaultPieceEval();
+
+
+// PRECONFIG
+
+// Update ELO
+$("#stockfish-elo").html(`${JSON.parse(fs.readFileSync(settingsFilePath))["elo"].toFixed(0)}`);
 
 
 // UTILITY FUNCTIONS
@@ -98,6 +114,43 @@ function lineToLetter(line) {
    return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'][line]
 }
 
+function clamp(value, min, max) {
+   return Math.min(Math.max(value, min), max)
+}
+
+function percentageToColor(percentage, maxHue = 120, minHue = 0) {
+   const hue = clamp(percentage * (maxHue - minHue) + minHue, minHue, maxHue);
+   return `hsl(${hue}, 50%, 50%)`;
+}
+
+function toggleGradient() {
+   // Toggle the gradient display
+   gradientDisplay = !gradientDisplay;
+   if (gradientDisplay) {
+      appendGradient();
+   } else {
+      removeSquareHighlights()
+   }
+}
+
+function appendGradient() {
+   // Append a gradient to the board
+   for (const key in boardEval) {
+      const squareEval = clamp(boardEval[key], -20, 20) + 20;
+      const percentage = squareEval / 40;
+
+      if (game.get(key) && game.get(key)["type"] === "k") {
+         if (game.get(key)["color"] === 'w') $(`.square-${key}`).css("background-color",
+            percentageToColor(pieceEval["King safety"]["mg_white"] + pieceEval["King safety"]["eg_white"] - pieceEval["King safety"]["mg_black"] - pieceEval["King safety"]["eg_black"] + 0.5)
+         );
+         else if (game.get(key)["color"] === 'b') $(`.square-${key}`).css("background-color",
+            percentageToColor(pieceEval["King safety"]["mg_black"] + pieceEval["King safety"]["eg_black"] - pieceEval["King safety"]["mg_white"] - pieceEval["King safety"]["eg_white"] + 0.5)
+         );
+         continue;
+      } else if (percentage == 0.5) continue;
+      $(`.square-${key}`).css("background-color", percentageToColor(percentage));
+   }
+}
 
 // STOCKFISH FUNCTIONS
 
@@ -118,7 +171,7 @@ function enableStockfishAnalysisMode() {
    // Set analysis parameters
    stockfish.postMessage("setoption name UCI_LimitStrength value false");
    stockfish.postMessage("setoption name Skill Level value 20");
-   stockfish.postMessage("setoption name MultiPV value 1");
+   stockfish.postMessage("setoption name MultiPV value 5");
 }
 
 // TODO: Balance this function
@@ -166,6 +219,7 @@ function addElo(amount) {
    if (elo < 0) elo = 0;
 
    // Update settings
+   $("#stockfish-elo").html(`${elo.toFixed(0)}`);
    settings["elo"] = elo;
    fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
 }
@@ -246,8 +300,8 @@ function startFirstChessTurn() {
    chessTurnHistory[chessTurn]["white_move"] = undefined;
    chessTurnHistory[chessTurn]["black_move"] = undefined;
    chessTurnHistory[chessTurn]["eval"] = { "eval": 0, "elo_change": 0 };
-   chessTurnHistory[chessTurn]["board_eval"] = boardEval;
-   chessTurnHistory[chessTurn]["piece_eval"] = pieceEval;
+   chessTurnHistory[chessTurn]["board_eval"] = $.extend(true, {}, boardEval);
+   chessTurnHistory[chessTurn]["piece_eval"] = $.extend(true, {}, pieceEval);
    startNextChessTurn();
 }
 
@@ -297,16 +351,59 @@ function updateChessTurnDisplay(currentTurn) {
    });
 }
 
+function addAlert(type, attribute, future, key) {
+   const alertKey = `${attribute.replaceAll(' ', '').toLowerCase()}-${future}-${key.toLowerCase()}`;
+   if ($(`#${alertKey}`).length > 0) return;
+   $("#alerts").append(/*html*/`
+   <div class='alert' id='${alertKey}'>
+      <span class='alert-attribute ${type}'>${attribute}</span>&nbsp;
+      <span class='alert-${future}'>${future}</span>&nbsp;
+      <span class='alert-key'>${key}</span>&nbsp;
+      <span class='alert-eval'>eval</span>&nbsp;
+   </div>`);
+}
+
+function updateEvaluationDisplay(chessTurn) {
+   // Update the evaluation display
+   // Clear alerts div
+   $("#alerts").html("");
+
+   // Fetch piece evaluation
+   for (const key of Object.keys(pieceEval)) {
+      const pieceEval = chessTurnHistory[chessTurn]["piece_eval"][key];
+
+      // Midgame evaluation
+      if (pieceEval["mg_white"] - pieceEval["mg_black"] > 0.5) addAlert("very-positive", "Very strong", "midgame", key);
+      else if (pieceEval["mg_white"] - pieceEval["mg_black"] > 0.2) addAlert("positive", "Strong", "midgame", key);
+      else if (pieceEval["mg_white"] - pieceEval["mg_black"] < -0.2) addAlert("negative", "Weak", "midgame", key);
+      else if (pieceEval["mg_white"] - pieceEval["mg_black"] < -0.5) addAlert("very-negative", "Very weak", "midgame", key);
+
+      // Endgame evaluation
+      if (pieceEval["eg_white"] - pieceEval["eg_black"] > 0.5) addAlert("very-positive", "Very strong", "endgame", key);
+      else if (pieceEval["eg_white"] - pieceEval["eg_black"] > 0.2) addAlert("positive", "Strong", "endgame", key);
+      else if (pieceEval["eg_white"] - pieceEval["eg_black"] < -0.2) addAlert("negative", "Weak", "endgame", key);
+      else if (pieceEval["eg_white"] - pieceEval["eg_black"] < -0.5) addAlert("very-negative", "Very weak", "endgame", key);
+   }
+}
+
 function startNextChessTurn() {
    // Set fen of turn
    chessTurnHistory[chessTurn]["fen"] = game.fen();
    log("[!] Last chess turn:", chessTurnHistory[chessTurn]);
    updateChessTurnDisplay(chessTurn);
+   updateEvaluationDisplay(chessTurn);
+   updateBoardElo($("#board-elo-square").html());
 
    // Update new chess turn
    chessTurn += 1;
    updateChessTurnHistory();
    updateGameFen();
+
+   // Update gradient display
+   if (gradientDisplay) {
+      removeSquareHighlights();
+      appendGradient();
+   }
 }
 
 function moveToTurn(turn) {
@@ -316,8 +413,19 @@ function moveToTurn(turn) {
    // Update chess turn
    chessTurn = turn;
    game.load(chessTurnHistory[chessTurn]["fen"]);
-   boardEval = chessTurnHistory[chessTurn]["board_eval"];
-   pieceEval = chessTurnHistory[chessTurn]["piece_eval"];
+
+   if (chessTurn > 0) {
+      boardEval = chessTurnHistory[chessTurn]["board_eval"];
+      pieceEval = chessTurnHistory[chessTurn]["piece_eval"];
+   } else {
+      boardEval = defaultBoardEval();
+      pieceEval = defaultPieceEval();
+   }
+
+   console.log(chessTurn);
+   console.log(boardEval);
+   console.log(chessTurnHistory);
+
 
    // Update fen
    updateGameFen();
@@ -334,6 +442,8 @@ function moveToTurn(turn) {
 
    // Reset board state
    chessTurnHistory[turn] = targetTurn;
+
+   // Start next turn
    startNextChessTurn();
    log("[!] Moved to turn:", turn, chessTurnHistory);
 }
@@ -379,11 +489,11 @@ function hightlightSquareHint(square) {
    const $square = $("#chessboard .square-" + square);
 
    // Fetch the background
-   let background = $square.hasClass('black-3c85d') ? blackRedSquareHighlightHint : whiteRedSquareHighlightHint;
+   let background = $square.hasClass('black-3c85d') ? blackSquareHighlightHint : whiteSquareHighlightHint;
 
    // Check if the square is an opponent's piece
    if (game.get(square) && game.get(square).color === 'b') {
-      background = background === whiteRedSquareHighlightHint ? whiteRedSquareHighlightHint : blackRedSquareHighlightHint;
+      background = background === whiteSquareHighlightHint ? whiteRedSquareHighlightHint : blackRedSquareHighlightHint;
    }
 
    // Update the square's background
@@ -423,9 +533,30 @@ function onDrop(source, target) {
 
    // Make stockfish move
    startStockfishTurn();
+
+   // Update gradient display
+   if (gradientDisplay) {
+      highlightSquare(source)
+      boardEval[source] = 0;
+   }
+}
+
+function updateBoardElo(square) {
+   // Update board elo
+   $("#board-elo-square").html(square);
+   $("#board-elo").html(boardEval[square]);
+
+   // Toggle class
+   $("#board-elo").removeClass("neutral positive negative");
+   if (boardEval[square] > 0) $("#board-elo").addClass("positive");
+   else if (boardEval[square] < 0) $("#board-elo").addClass("negative");
+   else if (boardEval[square] == 0) $("#board-elo").addClass("neutral");
 }
 
 function onMouseOverSquare(square, piece) {
+   // Update board elo
+   updateBoardElo(square);
+
    // Get all possible moves for this square
    const moves = game.moves({
       square: square,
@@ -450,6 +581,7 @@ function onMouseOverSquare(square, piece) {
 function onMouseOutSquare() {
    // Remove all highlights
    removeSquareHighlights()
+   if (gradientDisplay) appendGradient();
 }
 
 function onSnapEnd() {
@@ -463,6 +595,9 @@ function onSnapEnd() {
 function startStockfishTurn() {
    isStockfishPlaying = true;
    removeSquareHighlights();
+
+   // Update gradient display
+   if (gradientDisplay) appendGradient();
    log("\n[!] Generating move with parameters:", {
       "depth": getDepth(),
       "move_time": getMoveTime(), // 0.01 is good for me to test
@@ -567,7 +702,7 @@ function handleStockfishBoardEvaluation(eventData) {
       log("[*] BOARD EVAL END:", boardEval);
 
       // Update chess turn history
-      chessTurnHistory[chessTurn]["board_eval"] = boardEval;
+      chessTurnHistory[chessTurn]["board_eval"] = $.extend(true, {}, boardEval);
       return;
    }
 
@@ -619,6 +754,7 @@ function handleStockfishHint(eventData) {
       // Update state
       isStockfishHinting = false;
       isStockfishPlaying = false;
+      enableStockfishMoveMode();
    } catch (error) {
       // Retry stockfish move
       log(errorPrefix, error);
@@ -632,7 +768,10 @@ function generateHint() {
    isStockfishPlaying = true;
 
    // Generate hint
-   stockfish.postMessage("go depth 10");
+   enableStockfishAnalysisMode();
+   setTimeout(() => {
+      stockfish.postMessage("go depth 10");
+   }, 100);
 }
 
 
@@ -651,6 +790,7 @@ function stockfishErrorFallback() {
    setActivePlayer("w");
    moveToTurn(chessTurn - 1);
    removeSquareHighlights();
+   if (gradientDisplay) appendGradient();
 }
 
 var _DEBUG_THROW_ERROR = false; // TODO: Remove

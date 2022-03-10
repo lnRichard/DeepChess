@@ -1,15 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain, nativeTheme} = require('electron')
+const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron')
 const path = require('path')
 
 // Load electron reload extension
+/*
 require('electron-reload')(__dirname, {
   ignored: /data|[/\\]\./,
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
   hardResetMethod: 'exit'
 });
+*/
 
 // Load file system
 const fs = require("fs");
@@ -21,7 +23,7 @@ mkStore(root + "/account.json");
 mkStore(root + "/settings.json", JSON.stringify({ hue: 200, elo: 250, dynamic_elo: true }));
 
 // Create a store
-function mkStore(path, json="{}") {
+function mkStore(path, json = "{}") {
   if (!fs.existsSync(path)) {
     fs.writeFileSync(path, json);
   }
@@ -31,21 +33,21 @@ function mkStore(path, json="{}") {
 function mkDirectory(directory) {
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, {
-        recursive: true
+      recursive: true
     });
   }
 }
 
 // Check if user is logged in
 function isLoggedIn() {
-  let account = JSON.parse(fs.readFileSync(root+"/account.json"));
+  let account = JSON.parse(fs.readFileSync(root + "/account.json"));
   if (account["username"] && account["password"]) {
     return true;
   }
 }
 
 // Create the electron process
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -86,4 +88,3 @@ app.on('window-all-closed', function () {
 
 // Enable SharedArrayBuffer for compatibility with Electron
 app.commandLine.appendSwitch('enable-features', "SharedArrayBuffer")
-

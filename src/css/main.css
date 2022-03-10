@@ -20,6 +20,8 @@
 	--text1: hsl(var(--hue) 15% 85%);
 	--text2: hsl(var(--hue) 15% 65%);
 	--text3: hsl(var(--hue) 25% 65%);
+	--text4: hsl(var(--hue) 60% 75%);
+	--text5: hsl(var(--hue) 60% 55%);
 
 	--surface0: hsl(var(--hue) 10% 8%);
 	--surface1: hsl(var(--hue) 10% 10%);
@@ -147,9 +149,19 @@ main {
 	min-width: 15em;
 }
 
+.alert-box {
+	min-height: 28em;
+	max-height: 28em;
+	min-width: 15em;
+	max-width: 25em;
+	padding: var(--space-md);
+	padding-block-end: 0;
+	overflow: auto;
+}
+
 .chess-turn {
 	display: block;
-	padding: var(--space-sm);
+	padding: var(--space-xs);
 	border-radius: var(--space-sm);
 	border: 1px solid var(--surface4);
 	background: var(--surface5);
@@ -159,6 +171,21 @@ main {
 	cursor: pointer;
 	margin-bottom: 5px;
 	max-width: 25em;
+}
+
+.alert {
+	display: flex;
+	justify-content: center;
+	padding: var(--space-xs);
+	border-radius: var(--space-sm);
+	border: 1px solid var(--surface4);
+	background: var(--surface5);
+	box-shadow: 0px 0px 5px 0px var(--box-shadow1);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.75s ease-in-out;
+	font-size: 12px;
+	margin-bottom: 5px;
+	max-width: 25em;
+	color: var(--text3);
 }
 
 .chess-turn-field {
@@ -218,12 +245,32 @@ input {
 	color: #6cdd96;
 }
 
+.very-positive {
+	color: #43ee82;
+}
+
 .negative {
 	color: #dd6c6c;
 }
 
+.very-negative {
+	color: #ee4343;
+}
+
 .neutral {
 	color: #dddddd;
+}
+
+.alert-midgame {
+	color: var(--text4);
+}
+
+.alert-endgame {
+	color: var(--text5);
+}
+
+.alert-key {
+	color: var(--text1);
 }
 
 section {
@@ -293,11 +340,7 @@ fieldset:focus-within {
 	width: 10rem;
 }
 
-#back-button {
-	margin-block-start: 0;
-}
-
-#hint-button {
+#buttons button {
 	margin-block-start: 0;
 }
 
@@ -372,6 +415,12 @@ li::before {
 	width: 100%;
 }
 
+#flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .sub-container {
 	width: 25vw;
 	height: 40vw;
@@ -419,4 +468,12 @@ li::before {
 	text-align: center;
 	justify-content: center;
 	align-items: center;
+}
+
+.game-hint {
+	display: flex;
+	justify-content: center;
+	font-style: italic;
+	font-size: 12px;
+	cursor: pointer;
 }
