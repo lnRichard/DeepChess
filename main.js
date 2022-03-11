@@ -2,15 +2,18 @@
 /* eslint-disable no-undef */
 // Modules to control application life and create native browser window
 require('@electron/remote/main').initialize()
+const __development__ = false;
 const { app, BrowserWindow, ipcMain, nativeTheme } = require("electron")
 const path = require("path")
 
 // Load electron reload extension
-require("electron-reload")(__dirname, {
-  ignored: /data|[/\\]\./,
-  electron: path.join(__dirname, "node_modules", ".bin", "electron"),
-  hardResetMethod: "exit"
-});
+if (__development__) {
+  require("electron-reload")(__dirname, {
+    ignored: /data|[/\\]\./,
+    electron: path.join(__dirname, "node_modules", ".bin", "electron"),
+    hardResetMethod: "exit"
+  });
+}
 
 // Load file system
 const fs = require("fs");
