@@ -614,7 +614,6 @@ function handleStockfishMove(eventData) {
          const convert = move[4];
 
          // Get type
-         console.log("HERE: " + eventData.split(" "));
          let type = (convert) ? convert.toUpperCase() : game.get(move.slice(0, 2))["type"].toUpperCase();
 
          // Update chess turn history
@@ -624,6 +623,8 @@ function handleStockfishMove(eventData) {
          log("[!] AI MOVE: ", from, " -> ", to);
          game.remove(from);
          game.put({ type: type, color: "b" }, to);
+         if (to == "e8") game.put({ type: "R", color: "b" }, "f8");
+         else if (to === "c8") game.put({ type: "R", color: "b" }, "d8");
 
          // Update game fen
          updateGameFen();
