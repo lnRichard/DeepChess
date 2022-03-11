@@ -5,7 +5,6 @@
 // IMPORTS
 
 // Node imports
-const $ = require('jquery');
 const Chess = require('chess.js').Chess;
 
 

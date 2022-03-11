@@ -1,23 +1,25 @@
 "use strict";
 /* eslint-disable no-undef */
 // Define the constants
-const hue = document.querySelector("#hue");
-const elo = document.querySelector("#elo");
-const dynamic_elo = document.querySelector("#dynamic-elo");
-const settings_path = "./data/settings.json";
-const options = JSON.parse(fs.readFileSync(settings_path));
+const hue = $("#hue");
+const elo = $("#elo");
+const dynamicElo = $("#dynamic-elo");
+const darkMode = $("#dark-mode");
+const settingsPath = "./data/settings.json";
+const options = JSON.parse(fs.readFileSync(settingsPath));
+const { nativeTheme } = require('@electron/remote')
 
 // Save options on back button click
-document.querySelector("#back-button")
-   .addEventListener("click", () => {
-      fs.writeFileSync(settings_path, JSON.stringify(options));
-      window.location.href = "./menu.html";
-   });
+$("#back-button").on("click", () => {
+   fs.writeFileSync(settingsPath, JSON.stringify(options));
+   window.location.href = "./menu.html";
+});
 
 // Update the settings
-hue.value = options["hue"];
-elo.value = options["elo"];
-dynamic_elo.checked = options["dynamic_elo"];
+$(hue).val(options.hue);
+$(elo).val(options.elo);
+$(dynamicElo).prop("checked", options.dynamic_elo);
+$(darkMode).prop("checked", options.dark_mode);
 
 // Save a numeric settings
 function saveNumeric(field, type, min, max) {
@@ -35,7 +37,7 @@ function saveNumeric(field, type, min, max) {
    // Update setting
    field.value = value;
    options[type] = value;
-   fs.writeFileSync(settings_path, JSON.stringify(options));
+   fs.writeFileSync(settingsPath, JSON.stringify(options));
    return value;
 }
 
@@ -47,61 +49,72 @@ function saveBoolean(field, type) {
    // Update setting
    field.value = value;
    options[type] = value;
-   fs.writeFileSync(settings_path, JSON.stringify(options));
+   fs.writeFileSync(settingsPath, JSON.stringify(options));
+   return value;
 }
 
 // Change application hue on settings change
-hue.addEventListener("change", () => {
-   let value = saveNumeric(hue, "hue", 0, 360);
-   root.style.setProperty("--hue", value);
-});
+document.querySelector("#hue")
+   .addEventListener("change", () => {
+      let value = saveNumeric(document.querySelector("#hue"), "hue", 0, 360);
+      root.style.setProperty("--hue", value);
+   });
 
 // Change elo on settings change
-elo.addEventListener("change", () => {
-   saveNumeric(elo, "elo", 0, 3400);
-});
+document.querySelector("#elo")
+   .addEventListener("change", () => {
+      saveNumeric(document.querySelector("#elo"), "elo", 0, 3400);
+   });
 
 // Change dynamic elo on setting change
-dynamic_elo.addEventListener("change", () => {
-   saveBoolean(dynamic_elo, "dynamic_elo");
-});
+document.querySelector("#dynamic-elo")
+   .addEventListener("change", () => {
+      saveBoolean(document.querySelector("#dynamic-elo"), "dynamic_elo");
+   });
+
+// Change dark mode on setting change
+document.querySelector("#dark-mode")
+   .addEventListener("change", () => {
+      const value = saveBoolean(document.querySelector("#dark-mode"), "dark_mode");
+      nativeTheme.themeSource = (value) ? "dark" : "light";
+   });
 
 // Secret if the hue label is clicked
-document.querySelector("#hue-label").addEventListener("click", () => {
+$("#hue-label").on("click", () => {
    // Random integer from 0 to 360
    const value = Math.floor(Math.random() * 361);
-   hue.value = value;
-   options["hue"] = value;
+   hue.val(value);
+   options.hue = value;
    root.style.setProperty("--hue", value);
-   fs.writeFileSync(settings_path, JSON.stringify(options));
+   fs.writeFileSync(settingsPath, JSON.stringify(options));
 });
 
 // Secret when the user is named "Chroma", "Rainbow", or "Colors"
 if (["chroma", "rainbow", "colors"]
    .includes(
-      JSON.parse(fs.readFileSync('./data/account.json'))["username"].toLowerCase()
+      JSON.parse(fs.readFileSync('./data/account.json')).username.toLowerCase()
    )) {
    // Update hue every x miliseconds
    var up = true;
    setInterval(() => {
       if (up) {
          // Hue is going up
-         hue.value++;
-         root.style.setProperty("--hue", hue.value);
-         options["hue"] = hue.value;
-         if (hue.value >= 360) {
+         hue.val(hue.val() + 1);
+         root.style.setProperty("--hue", hue.val());
+         options.hue = hue.val();
+         if (hue.val() >= 360) {
             // Make hue go down
-            hue.value = 360;
+            hue.val(360);
             up = false;
          }
       } else {
          // Hue is going down
-         hue.value--;
-         root.style.setProperty("--hue", hue.value);
-         options["hue"] = hue.value;
-         if (hue.value <= 0) {
+         hue.val(hue.val() - 1);
+         root.style.setProperty("--hue", hue.val());
+         options.hue = hue.val();
+         if (hue.val() <= 0) {
             // Make hue go up
-            hue.value = 0;
+            hue.val(0);
             up = true;
          }
       }

@@ -4,17 +4,15 @@ const account = JSON.parse(fs.readFileSync('./data/account.json'));
 const username = account["username"];
 
 // Parse gretting
-let greeting = document.querySelector("#greeting");
-greeting.innerHTML = `Hello <span class="highlight">${username}</span>`;
+$("#greeting").html(`Hello <span class="highlight">${username}</span>`);
 
 // Go to play page
-document.querySelector("#play-button")
-   .addEventListener("click", () => {
-      window.location.href = "./play.html";
-   });
+$("#play-button").on("click", () => {
+   window.location.href = "./play.html";
+});
 
 // Go to settings page
-document.querySelector("#settings-button").addEventListener("click", () => {
+$("#settings-button").on("click", () => {
    window.location.href = "./settings.html";
 });
 
@@ -29,5 +27,5 @@ if (username.toLowerCase() === "admin") {
    }, 2700);
 
    // Coconut Mall the user
-   document.body.innerHTML = "<main><h1>Get Coconut Mall'd</h1><img src='./img/secret.gif'></main>";
+   $("body").html("<main><h1>Get Coconut Mall'd</h1><img src='./img/secret.gif'></main>");
 }

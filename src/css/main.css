@@ -32,36 +32,51 @@
 
 	--box-shadow1: hsl(var(--hue) 10% 11%);
 	--box-shadow2: hsl(var(--hue) 10% 12%);
+
+	--label1: rgba(255, 255, 255, 0.2);
+
+	--positive: #6cdd96;
+	--very-positive: #43ee82;
+	--negative: #dd6c6c;
+	--very-negative: #ee4343;
+	--neutral: #dddddd;
+
+	--scrollbar-track: #272729;
+	--scrollbar-thumb: #808080;
+	--scrollbar-thumb-hover: #747474;
 }
 
 @media (prefers-color-scheme: light) {
 	:root {
 		--brand: hsl(var(--hue) var(--saturation) var(--lightness));
 
-		/* very dark brand blue */
-		--text1: hsl(var(--hue) var(--saturation) 10%
-				/* lower is darker */
-			);
+		--text1: hsl(var(--hue) 100% 10%);
+		--text2: hsl(var(--hue) 85% 30%);
+		--text3: hsl(var(--hue) 75% 30%);
+		--text4: hsl(var(--hue) 60% 35%);
+		--text5: hsl(var(--hue) 60% 15%);
 
-		--text2: hsl(var(--hue) calc(var(--saturation) / 2) 30%);
-
-		--text3: hsl(var(--hue) calc(var(--saturation) / 2) 30%);
-		/* TODO: Change saturation for light theme */
-
-		/* very bright brand white */
-		--surface0: hsl(var(--hue) calc(var(--saturation) / 6) 96%);
-
-		--surface1: hsl(var(--hue) calc(var(--saturation) / 6) 90%);
-
-		--surface2: hsl(var(--hue) calc(var(--saturation) / 8) 99%);
-
-		--surface3: hsl(var(--hue) calc(var(--saturation) / 8) 96%);
-
-		--surface4: hsl(var(--hue) calc(var(--saturation) / 8) 85%);
+		--surface0: hsl(var(--hue) 17% 96%);
+		--surface1: hsl(var(--hue) 17% 90%);
+		--surface2: hsl(var(--hue) 13% 99%);
+		--surface3: hsl(var(--hue) 13% 96%);
+		--surface4: hsl(var(--hue) 13% 85%);
+		--surface5: hsl(var(--hue) 11% 83%);
 
 		--box-shadow1: hsl(var(--hue) calc(var(--saturation) / 6) 92%);
-
 		--box-shadow2: hsl(var(--hue) calc(var(--saturation) / 6) 93%);
+	
+		--label1: rgba(255, 255, 255, 0.2);
+
+		--positive: #2e9453;
+		--very-positive: #0ea746;
+		--negative: #8b2c2c;
+		--very-negative: #940a0a;
+		--neutral: #3d3d3d;
+
+		--scrollbar-track: #272729;
+		--scrollbar-thumb: #808080;
+		--scrollbar-thumb-hover: #747474;
 	}
 }
 
@@ -242,23 +257,23 @@ input {
 }
 
 .positive {
-	color: #6cdd96;
+	color: var(--positive);
 }
 
 .very-positive {
-	color: #43ee82;
+	color: var(--very-positive);
 }
 
 .negative {
-	color: #dd6c6c;
+	color: var(--negative);
 }
 
 .very-negative {
-	color: #ee4343;
+	color: var(--very-negative);
 }
 
 .neutral {
-	color: #dddddd;
+	color: var(--neutral);
 }
 
 .alert-midgame {
@@ -360,24 +375,19 @@ li::before {
 }
 
 ::-webkit-scrollbar-track {
-	background: white;
-	border-radius: var(--space-md);
-}
-
-::-webkit-scrollbar-track {
-	background: #272729;
+	background: var(--scrollbar-track);
 	border-radius: var(--space-md);
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #808080;
+	background: var(--scrollbar-thumb);
 	;
 	border-radius: var(--space-md);
 	background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #747474;
+	background: var(--scrollbar-thumb-hover);;
 	border-radius: var(--space-md);
 }
 
@@ -453,7 +463,7 @@ li::before {
 
 .info-label {
 	font-size: var(--space-sm);
-	color: rgba(255, 255, 255, 0.2);
+	color: var(--label1);
 }
 
 #type-2-eval {

@@ -1,5 +1,8 @@
+
 "use strict";
 /* eslint-disable no-undef */
+// eslint-disable-next-line no-unused-vars
+const $ = require('jquery');
 const root = document.documentElement;
 const fs = require("fs");
 var settings = JSON.parse(fs.readFileSync("./data/settings.json"));
