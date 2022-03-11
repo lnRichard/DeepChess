@@ -1,6 +1,6 @@
 {
   "name": "deepchess",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A minimal Electron chess application",
   "private": true,
   "main": "main.js",
