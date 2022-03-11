@@ -421,14 +421,6 @@ function moveToTurn(turn) {
       pieceEval = defaultPieceEval();
    }
 
-   console.log(chessTurn);
-   console.log(boardEval);
-   console.log(chessTurnHistory);
-
-
-   // Update fen
-   updateGameFen();
-
    // Update Display
    for (let index = chessTurnHistory.length; index > turn - 1; index--) {
       $(`#chess-turn-${index}`).remove();
@@ -619,11 +611,11 @@ function handleStockfishMove(eventData) {
          const move = eventData.split(" ")[1];
          const from = move.slice(0, 2);
          const to = move.slice(2, 4);
-         const convert = move.slice(5, 5);
-         let type;
+         const convert = move[4];
 
          // Get type
-         type = !convert ? game.get(move.slice(0, 2))["type"].toUpperCase() : convert.toUpperCase();
+         console.log("HERE: " + eventData.split(" "));
+         let type = (convert) ? convert.toUpperCase() : game.get(move.slice(0, 2))["type"].toUpperCase();
 
          // Update chess turn history
          chessTurnHistory[chessTurn]["black_move"] = { from: from, to: to };
